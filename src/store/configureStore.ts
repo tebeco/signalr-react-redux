@@ -1,11 +1,9 @@
-import { createStore, applyMiddleware, combineReducers } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { RootState, initialRootState } from './rootState';
-import { streamingReducer } from '../reducers/streamingReducer';
 import { RootActions } from './rootActions';
-
-const rootReducer = combineReducers({ streaming: streamingReducer });
+import { rootReducer } from '../reducers/rootReducer';
 
 export const configureStore = (preloadedState: RootState = initialRootState) => {
     const enhancer = composeWithDevTools(applyMiddleware(thunk));
@@ -15,6 +13,13 @@ export const configureStore = (preloadedState: RootState = initialRootState) => 
         preloadedState,
         enhancer
     );
+
+    if (module.hot) {
+        // Enable Webpack hot module replacement for reducers
+        module.hot.accept('../reducers/rootReducer', () => {
+            store.replaceReducer(rootReducer)
+        });
+    }
 
     return store;
 }
