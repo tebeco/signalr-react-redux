@@ -1,0 +1,62 @@
+.TopBar{
+    background-color: #333;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+li {
+    float: left;
+}
+
+li div {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li div:hover:not(.active) {
+    background-color: #111;
+}
+
+.active {
+    background-color: #4CAF50;
+}
+
+li svg {
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+}
+
+.TopBar-logo-Connected {
+    height: 48px;
+    pointer-events: none;
+}
+
+.TopBar-logo-Connecting {
+    animation: TopBar-logo-spin infinite 3s linear;
+    height: 48px;
+    pointer-events: none;
+}
+
+.TopBar-logo-Disconnected {
+    height: 48px;
+    pointer-events: none;
+}
+
+
+@keyframes TopBar-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}

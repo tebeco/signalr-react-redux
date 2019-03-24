@@ -1,13 +1,11 @@
 export type StreamingConnectedState = 'Connected';
 export type StreamingConnectingState = 'Connecting';
 export type StreamingDisconnectedState = 'Disconnected';
-export type StreamingDisconnectingState = 'Disconnecting';
 
 export type StreamingConnectivityState =
     StreamingConnectedState |
     StreamingConnectingState |
-    StreamingDisconnectedState |
-    StreamingDisconnectingState;
+    StreamingDisconnectedState;
 
 export type StreamingState = {
     connectivity: StreamingConnectivityState
