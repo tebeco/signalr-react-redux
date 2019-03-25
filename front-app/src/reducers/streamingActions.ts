@@ -1,13 +1,19 @@
 export type StreamingActions = 
     ConnectAction |
+    ConnectedAction |
     DisconnectAction;
 
-export type CONNECT_ACTION = 'STREAMING_CONNECT';
+export type STREAMING_CONNECT_ACTION = 'STREAMING_CONNECT_ACTION';
 export type ConnectAction = {
-    type: CONNECT_ACTION
+    type: STREAMING_CONNECT_ACTION
 };
 
-export type DISCONNECT_ACTION = 'STREAMING_DISCONNECT'; 
+export type STREAMING_CONNECTED_ACTION = 'STREAMING_CONNECTED_ACTION'; 
+export type ConnectedAction = {
+    type: STREAMING_CONNECTED_ACTION
+};
+
+export type STREAMING_DISCONNECT_ACTION = 'STREAMING_DISCONNECT_ACTION'; 
 export type DisconnectAction = {
-    type: DISCONNECT_ACTION
+    type: STREAMING_DISCONNECT_ACTION
 };
