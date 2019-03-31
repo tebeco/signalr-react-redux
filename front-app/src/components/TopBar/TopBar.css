@@ -9,6 +9,10 @@ ul {
     overflow: hidden;
 }
 
+.padding-li {
+    padding: 14px 16px;
+}
+
 li {
     float: left;
 }
@@ -17,7 +21,6 @@ li div {
     display: block;
     color: white;
     text-align: center;
-    padding: 14px 16px;
     text-decoration: none;
 }
 
@@ -32,7 +35,6 @@ li div:hover:not(.active) {
 li svg {
     display: block;
     text-align: center;
-    padding: 14px 16px;
 }
 
 .TopBar-logo-Connected {
