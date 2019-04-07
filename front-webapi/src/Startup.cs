@@ -31,12 +31,23 @@ namespace Front.WebApi
                 .AddMvc()
                 .AddNewtonsoftJson();
 
+            services.AddCors();
             services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
+            app.UseCors(corsPolicyBuilder =>
+            {
+                corsPolicyBuilder.WithOrigins("http://localhost:3000")
+                                 .AllowCredentials()
+                                 .AllowAnyMethod()
+                                 .AllowAnyHeader()
+                                 ;
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -48,7 +59,6 @@ namespace Front.WebApi
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting(routes =>
             {
                 routes.MapHub<FrontClientHub>("/clients");
