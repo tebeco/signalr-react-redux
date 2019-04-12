@@ -1,16 +1,16 @@
 import { Observable, defer, Subject } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
 import { RootState } from '../store/rootState';
-import { RootActions } from '../store/rootActions';
+import { RootAction } from '../store/rootActions';
 import { HubConnectionBuilder, LogLevel, HubConnection } from '@aspnet/signalr'
 import { ofType } from 'redux-observable';
-import { STREAMING_CONNECT_ACTION, STREAMING_CONNECTED_ACTION, STREAMING_DISCONNECT_ACTION, STREAMING_DISCONNECTED_ACTION, DisconnectedAction } from '../reducers/streamingActions';
-import { StreamingActions } from '../reducers/streamingActions';
+import { STREAMING_CONNECT_ACTION, STREAMING_CONNECTED_ACTION, STREAMING_DISCONNECT_ACTION, STREAMING_DISCONNECTED_ACTION, DisconnectedAction, ConnectAction, DisconnectAction } from '../reducers/streamingActions';
+import { StreamingAction } from '../reducers/streamingActions';
 
 
-export const createSignalrEpic = () => (actions$: Observable<RootActions>, state$: Observable<RootState>) => {
+export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$: Observable<RootState>) => {
     //Create subject
-    const signalrEpicSubject = new Subject<RootActions>();
+    const signalrEpicSubject = new Subject<RootAction>();
 
     const hubConnection = new HubConnectionBuilder()
         .configureLogging(LogLevel.Debug)
@@ -30,11 +30,10 @@ export const createSignalrEpic = () => (actions$: Observable<RootActions>, state
     return signalrEpicSubject;
 };
 
-const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<RootActions>, state$: Observable<RootState>): Observable<StreamingActions> => {
+const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<StreamingAction> => {
     return actions$.pipe(
-        ofType(STREAMING_CONNECT_ACTION),
+        ofType<RootAction, ConnectAction>(STREAMING_CONNECT_ACTION),
         mergeMap(_ => {
-
             return defer(async () => {
                 try {
                     await hubConnection.start()
@@ -49,15 +48,15 @@ const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<
             });
         }),
         map(action => {
-            return action as StreamingActions
+            return action as StreamingAction
         })
     )
 };
 
 
-const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observable<RootActions>, state$: Observable<RootState>): Observable<StreamingActions> => {
+const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<StreamingAction> => {
     return actions$.pipe(
-        ofType(STREAMING_DISCONNECT_ACTION),
+        ofType<RootAction, DisconnectAction>(STREAMING_DISCONNECT_ACTION),
         mergeMap(_ => {
             return defer(async () => {
                 await hubConnection.stop();

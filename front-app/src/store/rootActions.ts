@@ -1,4 +1,4 @@
-import { StreamingActions } from "../reducers/streamingActions";
+import { StreamingAction } from "../reducers/streamingActions";
 
-export type RootActions =
-    StreamingActions;
+export type RootAction =
+    StreamingAction;

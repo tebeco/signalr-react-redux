@@ -3,7 +3,7 @@ import './TopBar.css'
 import { connect } from "react-redux";
 import { Dispatch, bindActionCreators } from 'redux';
 import { StreamingConnectivityState, RootState } from "../../store/rootState";
-import { ConnectAction, StreamingActions, DisconnectAction } from '../../reducers/streamingActions';
+import { ConnectAction, StreamingAction, DisconnectAction } from '../../reducers/streamingActions';
 
 const getConnectivityButton = (props: TopBarProps): JSX.Element => {
     switch (props.appConnectivity) {
@@ -70,12 +70,7 @@ const mapStateToProps = (state: RootState) => ({
     appConnectivity: state.streaming.connectivity,
 });
 
-const mapDispatchToProps = (dispatch: Dispatch<StreamingActions>) => {
-    return {
-        dispatch,
-        ...bindActionCreators({ doConnect, doDisconnect }, dispatch)
-    };
-};
+const mapDispatchToProps = (dispatch: Dispatch<StreamingAction>) => bindActionCreators({ doConnect, doDisconnect }, dispatch);
 
 
 export const TopBar = connect(mapStateToProps, mapDispatchToProps)(TopBarComponent);

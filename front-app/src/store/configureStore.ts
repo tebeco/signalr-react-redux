@@ -2,17 +2,17 @@ import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { RootState, initialRootState } from './rootState';
-import { RootActions } from './rootActions';
+import { RootAction } from './rootActions';
 import { rootReducer } from '../reducers/rootReducer';
 import { createEpicMiddleware } from 'redux-observable';
 import { rootEpic } from '../epics/rootEpic';
 
 export const configureStore = (preloadedState: RootState = initialRootState) => {
-    const epicMiddleware = createEpicMiddleware<RootActions, RootActions, RootState, {}>();
+    const epicMiddleware = createEpicMiddleware<RootAction, RootAction, RootState, {}>();
 
     const enhancer = composeWithDevTools(applyMiddleware(thunk, epicMiddleware));
 
-    const store = createStore<RootState, RootActions, {}, {}>(
+    const store = createStore<RootState, RootAction, {}, {}>(
         rootReducer,
         preloadedState,
         enhancer

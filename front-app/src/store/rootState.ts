@@ -7,11 +7,11 @@ export type StreamingConnectivityState =
     StreamingConnectingState |
     StreamingDisconnectedState;
 
-export type StreamingState = {
+export interface StreamingState {
     connectivity: StreamingConnectivityState
 };
 
-export type RootState = {
+export interface RootState {
     streaming: StreamingState
 };
 
