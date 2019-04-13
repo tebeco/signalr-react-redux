@@ -1,10 +1,10 @@
 import { createStore, applyMiddleware } from 'redux';
+import { createEpicMiddleware } from 'redux-observable';
 import thunk from 'redux-thunk';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { RootState, initialRootState } from './rootState';
 import { RootAction } from './rootActions';
 import { rootReducer } from '../reducers/rootReducer';
-import { createEpicMiddleware } from 'redux-observable';
 import { rootEpic } from '../epics/rootEpic';
 
 export const configureStore = (preloadedState: RootState = initialRootState) => {
@@ -19,7 +19,6 @@ export const configureStore = (preloadedState: RootState = initialRootState) => 
     );
 
     epicMiddleware.run(rootEpic);
-
 
     if (module.hot) {
         // Enable Webpack hot module replacement for reducers
