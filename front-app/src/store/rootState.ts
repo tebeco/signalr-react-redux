@@ -11,15 +11,26 @@ export interface StreamingState {
     connectivity: StreamingConnectivityState
 };
 
-export interface TileState {
+export type TileState =
+    | ErrorTileState
+    | SharedProductTileState
+
+export const ERROR_TILE_STATE = 'ERROR_TILE_STATE'
+export interface ErrorTileState {
+    type: 'ERROR_TILE_STATE'
     id: string;
-    product: string;
 }
+
+export const SHARED_PRODUCT_STATE = 'SHARED_PRODUCT_STATE';
+export interface SharedProductTileState {
+    id: string;
+    type: 'SHARED_PRODUCT_STATE'
+    product: string;
+    price: string | '-';
+}
+
 export interface WorkspaceState {
-    tiles: {
-        byId: { [id: string]: TileState }
-        allIds: string[]
-    }
+    tiles: Record<string, TileState>
 }
 
 export interface RootState {
@@ -31,20 +42,21 @@ export const initialStreamingState: StreamingState = {
     connectivity: 'Disconnected'
 };
 
+const tiles: TileState[] = [
+    { id: '1', product: 'productId1', price: '-', type: 'SHARED_PRODUCT_STATE' },
+    { id: '2', product: 'productId2', price: '-', type: 'SHARED_PRODUCT_STATE' },
+    { id: '3', product: 'productId3', price: '-', type: 'SHARED_PRODUCT_STATE' },
+    { id: '4', product: 'productId4', price: '-', type: 'SHARED_PRODUCT_STATE' },
+    { id: '5', type: 'ERROR_TILE_STATE' },
+    { id: '6', product: 'productId6', price: '-', type: 'SHARED_PRODUCT_STATE' },
+    { id: '7', product: 'productId1', price: '-', type: 'SHARED_PRODUCT_STATE' },
+    { id: '8', product: 'productId1', price: '-', type: 'SHARED_PRODUCT_STATE' },
+]
+
+const initialTiles = tiles.reduce((acc, current) => ({ ...acc, [current.id]: current }), {} as Record<string, TileState>)
+
 export const initialWorkspaceState = {
-    tiles: {
-        byId: {
-            '1': { id: '1', product: 'product 1' },
-            '2': { id: '2', product: 'product 2' },
-            '3': { id: '3', product: 'product 3' },
-            '4': { id: '4', product: 'product 4' },
-            '5': { id: '5', product: 'product 5' },
-            '6': { id: '6', product: 'product 6' },
-            '7': { id: '7', product: 'product 7' },
-            '8': { id: '8', product: 'product 8' },
-        },
-        allIds: ['1', '2', '3', '4', '5', '6', '7', '8']
-    }
+    tiles: initialTiles,
 };
 
 export const initialRootState: RootState = {

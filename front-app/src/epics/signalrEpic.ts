@@ -1,11 +1,11 @@
-import { Observable, defer, Subject } from 'rxjs';
+import { Observable, defer, Subject, Observer } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
 import { RootState } from '../store/rootState';
 import { RootAction } from '../store/rootActions';
 import { HubConnectionBuilder, LogLevel, HubConnection } from '@aspnet/signalr'
 import { ofType } from 'redux-observable';
-import { STREAMING_CONNECT_ACTION, STREAMING_CONNECTED_ACTION, STREAMING_DISCONNECT_ACTION, STREAMING_DISCONNECTED_ACTION, DisconnectedAction, ConnectAction, DisconnectAction } from '../reducers/streamingActions';
-import { StreamingAction } from '../reducers/streamingActions';
+import { STREAMING_CONNECT_ACTION, STREAMING_CONNECTED_ACTION, STREAMING_DISCONNECT_ACTION, STREAMING_DISCONNECTED_ACTION, STREAMING_SUBSCRIBE_TO_PRODUCT_ACTION, SubscribedToProductAction, STREAMING_SUBSCRIBED_TO_PRODUCT_ACTION } from '../reducers/streamingActions';
+import { DisconnectedAction, ConnectAction, DisconnectAction, SubscribeToProductAction, StreamingAction, NewPriceAction } from '../reducers/streamingActions';
 
 
 export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$: Observable<RootState>) => {
@@ -19,9 +19,11 @@ export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$
 
     const connect$ = handleConnectAction(hubConnection, actions$, state$);
     const diconnect$ = handleDisconnectAction(hubConnection, actions$, state$);
+    const subscribe$ = handleSubscribeToProduct(hubConnection, actions$, state$);
 
     connect$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
     diconnect$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
+    subscribe$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
 
     hubConnection.onclose((err) => signalrEpicSubject.next({
         type: STREAMING_DISCONNECTED_ACTION
@@ -53,7 +55,6 @@ const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<
     )
 };
 
-
 const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<StreamingAction> => {
     return actions$.pipe(
         ofType<RootAction, DisconnectAction>(STREAMING_DISCONNECT_ACTION),
@@ -72,23 +73,37 @@ const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observab
     )
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                          SUBSCRIBE TO STREAM                                           //
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+interface ProductNewPrice {
+    id: string,
+    price: string
+}
+const handleSubscribeToProduct = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<NewPriceAction> => {
+    return actions$.pipe(
+        ofType<RootAction, SubscribeToProductAction>(STREAMING_SUBSCRIBE_TO_PRODUCT_ACTION),
+        mergeMap(action => {
+            return Observable.create((observer: Observer<NewPriceAction>) => {
+                const streamResult = hubConnection.stream<ProductNewPrice>("SubscribeToSharedProduct", action.product)
 
-// const streamResult = hubConnection.stream("randomIntStream");
-// const subscription = streamResult.subscribe({
-//     next: (msg) => {
-//         console.table(msg);
-//     },
-//     error: (err) => {
-//         console.log(err);
-//     },
-//     complete: () => {
-//         console.log('stream as completed');
-//     },
-// });
-
+                streamResult.subscribe({
+                    next: (msg) => {
+                        observer.next({
+                            type: 'NEW_PRICE_ACTION',
+                            product: msg.id,
+                            price: msg.price
+                        } as NewPriceAction);
+                    },
+                    error: (err) => {
+                        console.log(err);
+                        observer.complete();
+                    },
+                    complete: () => {
+                        observer.complete();
+                    }
+                });
+            }) as Observable<NewPriceAction>;
+        })
+    );
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                          UNSUBSCRIBE TO STREAM                                           //
