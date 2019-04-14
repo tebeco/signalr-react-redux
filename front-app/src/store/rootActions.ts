@@ -1,4 +1,7 @@
-import { StreamingAction } from "../reducers/streamingActions";
+import { ConnectivityAction } from "../reducers/connectivityActions";
+import { ProductAction } from "../reducers/pricerActions";
 
 export type RootAction =
-    StreamingAction;
+    | ConnectivityAction
+    | ProductAction
+    ;

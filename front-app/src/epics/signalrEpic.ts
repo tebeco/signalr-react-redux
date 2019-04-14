@@ -1,14 +1,15 @@
-import { Observable, defer, Subject } from 'rxjs';
-import { mergeMap, map } from 'rxjs/operators';
+import { Observable, defer, Subject, Observer } from 'rxjs';
+import { mergeMap, map, tap, withLatestFrom, filter, merge } from 'rxjs/operators';
+import { HubConnectionBuilder, LogLevel, HubConnection } from '@aspnet/signalr'
+import { ofType, StateObservable } from 'redux-observable';
 import { RootState } from '../store/rootState';
 import { RootAction } from '../store/rootActions';
-import { HubConnectionBuilder, LogLevel, HubConnection } from '@aspnet/signalr'
-import { ofType } from 'redux-observable';
-import { STREAMING_CONNECT_ACTION, STREAMING_CONNECTED_ACTION, STREAMING_DISCONNECT_ACTION, STREAMING_DISCONNECTED_ACTION, DisconnectedAction, ConnectAction, DisconnectAction } from '../reducers/streamingActions';
-import { StreamingAction } from '../reducers/streamingActions';
+import { SIGNALR_CONNECT_ACTION, SIGNALR_DISCONNECT_ACTION, onSignalRConnected, onSignalRDisconnected, onSignalRDisconnecting } from '../reducers/connectivityActions';
+import { ConnectAction, DisconnectAction, ConnectivityAction } from '../reducers/connectivityActions';
+import { SubscribeToInfiniteProductAction, SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION, updateInfiniteProductPrice, SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION, SubscribeToLimitedProductAction, LimitedProductAction, updateLimitedProductPrice, onSubscribedToLimitedProductAction, onUnsubscribedToLimitedProductAction, InfiniteProductAction, onSubscribedToInfiniteProductAction, onUnsubscribedToInfiniteProductAction } from '../reducers/pricerActions';
 
 
-export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$: Observable<RootState>) => {
+export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$: StateObservable<RootState>) => {
     //Create subject
     const signalrEpicSubject = new Subject<RootAction>();
 
@@ -19,79 +20,109 @@ export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$
 
     const connect$ = handleConnectAction(hubConnection, actions$, state$);
     const diconnect$ = handleDisconnectAction(hubConnection, actions$, state$);
+    const subscribeToInfiniteProduct$ = handleSubscribeToInfiniteProduct(hubConnection, actions$, state$);
+    const subscribeToLimitedProduct$ = handleSubscribeToLimitedProduct(hubConnection, actions$, state$);
 
     connect$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
     diconnect$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
+    subscribeToInfiniteProduct$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
+    subscribeToLimitedProduct$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
 
-    hubConnection.onclose((err) => signalrEpicSubject.next({
-        type: STREAMING_DISCONNECTED_ACTION
-    }));
+    hubConnection.onclose((err) => {
+        signalrEpicSubject.next(onSignalRDisconnected());
+    });
 
     return signalrEpicSubject;
 };
 
-const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<StreamingAction> => {
+const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: StateObservable<RootState>): Observable<ConnectivityAction> => {
     return actions$.pipe(
-        ofType<RootAction, ConnectAction>(STREAMING_CONNECT_ACTION),
+        ofType<RootAction, ConnectAction>(SIGNALR_CONNECT_ACTION),
         mergeMap(_ => {
             return defer(async () => {
                 try {
-                    await hubConnection.start()
-                    return ({
-                        type: STREAMING_CONNECTED_ACTION
-                    });
+                    await hubConnection.start();
+
+                    return onSignalRConnected();
                 } catch (error) {
-                    return ({
-                        type: STREAMING_DISCONNECTED_ACTION
-                    });
+                    return onSignalRDisconnected();
                 }
             });
-        }),
-        map(action => {
-            return action as StreamingAction
         })
     )
 };
 
-
-const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<StreamingAction> => {
+const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: StateObservable<RootState>): Observable<ConnectivityAction> => {
     return actions$.pipe(
-        ofType<RootAction, DisconnectAction>(STREAMING_DISCONNECT_ACTION),
-        mergeMap(_ => {
-            return defer(async () => {
-                await hubConnection.stop();
-
-                return ({
-                    type: STREAMING_DISCONNECTED_ACTION
-                });
-            });
-        }),
-        map(action => {
-            return action as DisconnectedAction
-        })
+        ofType<RootAction, DisconnectAction>(SIGNALR_DISCONNECT_ACTION),
+        map(_ => onSignalRDisconnecting()),
+        tap(_ => hubConnection.stop())
     )
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                          SUBSCRIBE TO STREAM                                           //
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+interface InfiniteProductNewPrice {
+    productId: string,
+    price: string
+}
 
-// const streamResult = hubConnection.stream("randomIntStream");
-// const subscription = streamResult.subscribe({
-//     next: (msg) => {
-//         console.table(msg);
-//     },
-//     error: (err) => {
-//         console.log(err);
-//     },
-//     complete: () => {
-//         console.log('stream as completed');
-//     },
-// });
+const handleSubscribeToInfiniteProduct = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: StateObservable<RootState>): Observable<InfiniteProductAction> => {
+    return actions$.pipe(
+        ofType<RootAction, SubscribeToInfiniteProductAction>(SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION),
+        withLatestFrom(state$),
+        filter(([action, state]) => {
+            return state.streaming.infiniteSubscriptions.filter(infiniteSubscription => infiniteSubscription.productId === action.productId).length === 0;
+        }),
+        mergeMap(([action, _]) => {
+            return Observable.create((observer: Observer<InfiniteProductAction>) => {
+                const streamResult = hubConnection.stream<InfiniteProductNewPrice>("SubscribeToInfiniteProduct", action.productId);
+
+                const unsubscribe = (observer: Observer<InfiniteProductAction>, productId: string) => {
+                    observer.next(onUnsubscribedToInfiniteProductAction(action.productId));
+                    observer.complete();
+                }
+
+                streamResult.subscribe({
+                    next: (newPrice) => observer.next(updateInfiniteProductPrice(newPrice.productId, newPrice.price)),
+                    error: (_) => unsubscribe(observer, action.productId),
+                    complete: () => unsubscribe(observer, action.productId),
+                });
+
+                observer.next(onSubscribedToInfiniteProductAction(action.productId));
+            }) as Observable<InfiniteProductAction>;
+        })
+    );
+};
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                          UNSUBSCRIBE TO STREAM                                           //
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+interface LimitedProductNewPrice {
+    productId: string,
+    price: string
+}
 
-// subscription.dispose();
+const handleSubscribeToLimitedProduct = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: StateObservable<RootState>): Observable<LimitedProductAction> => {
+    return actions$.pipe(
+        ofType<RootAction, SubscribeToLimitedProductAction>(SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION),
+        withLatestFrom(state$),
+        filter(([action, state]) => {
+            return state.streaming.limitedSubscriptions.filter(limitedSubscription => limitedSubscription.productId === action.productId).length === 0;
+        }),
+        mergeMap(([action, _]) => {
+            return Observable.create((observer: Observer<LimitedProductAction>) => {
+                const streamResult = hubConnection.stream<LimitedProductNewPrice>("SubscribeToLimitedProduct", action.productId);
+
+                const unsubscribe = (observer: Observer<LimitedProductAction>, productId: string) => {
+                    observer.next(onUnsubscribedToLimitedProductAction(action.productId));
+                    observer.complete();
+                }
+
+                streamResult.subscribe({
+                    next: (newPrice) => observer.next(updateLimitedProductPrice(newPrice.productId, newPrice.price)),
+                    error: (_) => unsubscribe(observer, action.productId),
+                    complete: () => unsubscribe(observer, action.productId),
+                });
+
+                observer.next(onSubscribedToLimitedProductAction(action.productId));
+            }) as Observable<LimitedProductAction>;
+        })
+    );
+};

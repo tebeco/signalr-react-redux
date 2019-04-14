@@ -1,25 +1,40 @@
-import { StreamingState, initialStreamingState } from '../store/rootState';
-import { StreamingAction } from "./streamingActions";
+import { StreamingState, initialStreamingState } from "../store/streamingState";
+import { ProductAction } from "./pricerActions";
 
-export const streamingReducer = (state: StreamingState = initialStreamingState, action: StreamingAction): StreamingState => {
+export const streamingReducer = (state: StreamingState = initialStreamingState, action: ProductAction): StreamingState => {
     switch (action.type) {
-        case 'STREAMING_CONNECT_ACTION':
+        case 'SUBSCRIBED_TO_INFINITE_PRODUCT_ACTION':
             return {
                 ...state,
-                connectivity: 'Connecting'
+                infiniteSubscriptions: [
+                    ...state.infiniteSubscriptions,
+                    { productId: action.productId }
+                ]
             };
-        case 'STREAMING_CONNECTED_ACTION':
+        case 'UNSUBSCRIBED_TO_INFINITE_PRODUCT_ACTION':
             return {
                 ...state,
-                connectivity: 'Connected'
+                infiniteSubscriptions: [
+                    ...state.infiniteSubscriptions.filter(sub => sub.productId !== action.productId)
+                ]
             };
-        case 'STREAMING_DISCONNECT_ACTION':
+        case 'SUBSCRIBED_TO_LIMITED_PRODUCT_ACTION':
             return {
                 ...state,
-                connectivity: 'Disconnected'
+                limitedSubscriptions: [
+                    ...state.limitedSubscriptions,
+                    { productId: action.productId }
+                ]
+            };
+        case 'UNSUBSCRIBED_TO_LIMITED_PRODUCT_ACTION':
+            return {
+                ...state,
+                limitedSubscriptions: [
+                    ...state.limitedSubscriptions.filter(sub => sub.productId !== action.productId)
+                ]
             };
         default:
-            return state
+            return state;
     }
 }
 
