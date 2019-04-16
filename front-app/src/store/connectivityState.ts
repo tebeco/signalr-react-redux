@@ -1,16 +1,16 @@
-export type StreamingConnectedState = 'Connected';
-export type StreamingConnectingState = 'Connecting';
-export type StreamingDisconnectedState = 'Disconnected';
+export type ConnectedState = 'Connected';
+export type ConnectingState = 'Connecting';
+export type DisconnectedState = 'Disconnected';
 
 export type StreamingConnectivityState =
-    | StreamingConnectedState
-    | StreamingConnectingState
-    | StreamingDisconnectedState;
+    | ConnectedState
+    | ConnectingState
+    | DisconnectedState;
 
-export interface StreamingState {
+export interface ConnectivityState {
     connectivity: StreamingConnectivityState
 };
 
-export const initialStreamingState: StreamingState = {
+export const initialStreamingState: ConnectivityState = {
     connectivity: 'Disconnected'
 };

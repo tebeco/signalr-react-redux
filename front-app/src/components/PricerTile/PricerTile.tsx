@@ -43,7 +43,7 @@ const mapStateToProps = (state: RootState, ownProps: OwnProps) => {
     const pricerState = state.workspace.tiles[ownProps.id] as SharedProductTileState;
     return {
         pricerId: pricerState.id,
-        product: pricerState.product,
+        product: pricerState.productId,
         price: pricerState.price
     }
 }

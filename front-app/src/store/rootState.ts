@@ -1,8 +1,8 @@
-import { StreamingState, initialStreamingState } from "./connectivityState";
+import { ConnectivityState, initialStreamingState } from "./connectivityState";
 import { WorkspaceState, initialWorkspaceState } from "./workspaceState";
 
 export interface RootState {
-    streaming: StreamingState
+    streaming: ConnectivityState
     workspace: WorkspaceState
 };
 

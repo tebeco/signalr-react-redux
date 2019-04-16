@@ -7,7 +7,7 @@ export const workspaceReducer = (state: WorkspaceState = initialWorkspaceState, 
             Object.keys
             const updatedTiles = Object
                 .values(state.tiles)
-                .filter(tile => tile.type === "SHARED_PRODUCT_STATE" && tile.product === action.product)
+                .filter(tile => tile.type === "SHARED_PRODUCT_STATE" && tile.productId === action.product)
                 .map(tile => ({ ...tile, price: action.price }))
                 .reduce((acc, current) => ({ ...acc, [current.id]: current }), {} as Record<string, TileState>);
 

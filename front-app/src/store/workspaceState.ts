@@ -12,24 +12,23 @@ export const SHARED_PRODUCT_STATE = 'SHARED_PRODUCT_STATE';
 export interface SharedProductTileState {
     id: string;
     type: 'SHARED_PRODUCT_STATE'
-    product: string;
+    productId: string;
     price: string | '-';
 }
 
 export interface WorkspaceState {
-tiles: Record<string, TileState>
+    tiles: Record<string, TileState>
 }
 
+const createDefaultSharedProductTile = (id: string, product: string): SharedProductTileState => ({ id, type: 'SHARED_PRODUCT_STATE', productId: product, price: '-' })
 
 const tiles: TileState[] = [
-    { id: '1', product: 'productId1', price: '-', type: 'SHARED_PRODUCT_STATE' },
-    { id: '2', product: 'productId2', price: '-', type: 'SHARED_PRODUCT_STATE' },
-    { id: '3', product: 'productId3', price: '-', type: 'SHARED_PRODUCT_STATE' },
-    { id: '4', product: 'productId4', price: '-', type: 'SHARED_PRODUCT_STATE' },
+    createDefaultSharedProductTile('1', 'productId1'),
+    createDefaultSharedProductTile('2', 'productId1'),
+    createDefaultSharedProductTile('3', 'productId3'),
+    createDefaultSharedProductTile('4', 'productId4'),
     { id: '5', type: 'ERROR_TILE_STATE' },
-    { id: '6', product: 'productId6', price: '-', type: 'SHARED_PRODUCT_STATE' },
-    { id: '7', product: 'productId1', price: '-', type: 'SHARED_PRODUCT_STATE' },
-    { id: '8', product: 'productId1', price: '-', type: 'SHARED_PRODUCT_STATE' },
+    createDefaultSharedProductTile('6', 'productId6'),
 ]
 
 const initialTiles = tiles.reduce((acc, current) => ({ ...acc, [current.id]: current }), {} as Record<string, TileState>)

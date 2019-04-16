@@ -1,7 +1,7 @@
 import { ConnectivityAction } from "./connectivityActions";
-import { StreamingState, initialStreamingState } from "../store/connectivityState";
+import { ConnectivityState, initialStreamingState } from "../store/connectivityState";
 
-export const streamingReducer = (state: StreamingState = initialStreamingState, action: ConnectivityAction): StreamingState => {
+export const streamingReducer = (state: ConnectivityState = initialStreamingState, action: ConnectivityAction): ConnectivityState => {
     switch (action.type) {
         case 'SIGNALR_CONNECT_ACTION':
             return {
