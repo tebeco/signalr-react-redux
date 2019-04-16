@@ -1,8 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { RootState, SharedProductTileState } from '../../store/rootState';
-import { StreamingAction, SubscribeToProductAction } from '../../reducers/streamingActions';
 import { bindActionCreators, Dispatch } from 'redux';
+import { RootState } from '../../store/rootState';
+import { StreamingAction } from '../../reducers/streamingActions';
+import { SubscribeToProductAction } from '../../reducers/pricerActions';
+import { SharedProductTileState } from '../../store/workspaceState';
 
 interface PricerTileProps {
     pricerId: string,

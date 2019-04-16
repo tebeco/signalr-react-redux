@@ -2,8 +2,9 @@ import React from 'react';
 import './TopBar.css'
 import { connect } from "react-redux";
 import { Dispatch, bindActionCreators } from 'redux';
-import { StreamingConnectivityState, RootState } from "../../store/rootState";
-import { ConnectAction, StreamingAction, DisconnectAction, SubscribeToProductAction } from '../../reducers/streamingActions';
+import { RootState } from "../../store/rootState";
+import { ConnectAction, StreamingAction, DisconnectAction } from '../../reducers/streamingActions';
+import { StreamingConnectivityState } from '../../store/connectivityState';
 
 const getConnectivityButton = (props: TopBarProps): JSX.Element => {
     switch (props.appConnectivity) {
@@ -46,7 +47,6 @@ const TopBarComponent = (props: TopBarProps) => {
 
                 </li>
                 <li className="padding-li"><div>{getConnectivityButton(props)}</div></li>
-                <li className="padding-li"><div><a onClick={props.doSubscribe}>Subscribe</a></div></li>
             </ul>
         </div>
     );
@@ -56,7 +56,6 @@ type TopBarProps = {
     appConnectivity: StreamingConnectivityState;
     doConnect: () => ConnectAction;
     doDisconnect: () => DisconnectAction;
-    doSubscribe: () => SubscribeToProductAction;
 };
 
 const doConnect = (): ConnectAction => ({
@@ -67,16 +66,11 @@ const doDisconnect = (): DisconnectAction => ({
     type: 'STREAMING_DISCONNECT_ACTION'
 });
 
-const doSubscribe = (): SubscribeToProductAction => ({
-    type: 'STREAMING_SUBSCRIBE_TO_PRODUCT_ACTION',
-    product: 'productId1',
-})
-
 const mapStateToProps = (state: RootState) => ({
     appConnectivity: state.streaming.connectivity,
 });
 
-const mapDispatchToProps = (dispatch: Dispatch<StreamingAction>) => bindActionCreators({ doConnect, doDisconnect, doSubscribe }, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch<StreamingAction>) => bindActionCreators({ doConnect, doDisconnect }, dispatch);
 
 
 export const TopBar = connect(mapStateToProps, mapDispatchToProps)(TopBarComponent);

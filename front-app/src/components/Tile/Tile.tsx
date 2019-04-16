@@ -1,9 +1,10 @@
 import React from 'react';
 import { connect } from "react-redux";
 import './Tile.css'
-import { RootState, TileState, SHARED_PRODUCT_STATE } from '../../store/rootState';
+import { RootState } from '../../store/rootState';
 import { PricerTile } from '../PricerTile/PricerTile';
 import { ErrorTile } from '../ErrorTile/ErrorTile';
+import { TileState, SHARED_PRODUCT_STATE } from '../../store/workspaceState';
 
 
 interface TileProps {

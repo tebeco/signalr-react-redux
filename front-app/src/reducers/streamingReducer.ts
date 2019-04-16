@@ -1,5 +1,5 @@
-import { StreamingState, initialStreamingState } from '../store/rootState';
 import { StreamingAction } from "./streamingActions";
+import { StreamingState, initialStreamingState } from "../store/connectivityState";
 
 export const streamingReducer = (state: StreamingState = initialStreamingState, action: StreamingAction): StreamingState => {
     switch (action.type) {

@@ -1,5 +1,5 @@
-import { WorkspaceState, initialWorkspaceState, TileState } from '../store/rootState';
-import { NewPriceAction } from './streamingActions';
+import { NewPriceAction } from "./pricerActions";
+import { WorkspaceState, TileState, initialWorkspaceState } from "../store/workspaceState";
 
 export const workspaceReducer = (state: WorkspaceState = initialWorkspaceState, action: NewPriceAction): WorkspaceState => {
     switch (action.type) {

@@ -1,11 +1,12 @@
 import { Observable, defer, Subject, Observer } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';
-import { RootState } from '../store/rootState';
-import { RootAction } from '../store/rootActions';
 import { HubConnectionBuilder, LogLevel, HubConnection } from '@aspnet/signalr'
 import { ofType } from 'redux-observable';
-import { STREAMING_CONNECT_ACTION, STREAMING_CONNECTED_ACTION, STREAMING_DISCONNECT_ACTION, STREAMING_DISCONNECTED_ACTION, STREAMING_SUBSCRIBE_TO_PRODUCT_ACTION, SubscribedToProductAction, STREAMING_SUBSCRIBED_TO_PRODUCT_ACTION } from '../reducers/streamingActions';
-import { DisconnectedAction, ConnectAction, DisconnectAction, SubscribeToProductAction, StreamingAction, NewPriceAction } from '../reducers/streamingActions';
+import { RootState } from '../store/rootState';
+import { RootAction } from '../store/rootActions';
+import { STREAMING_CONNECT_ACTION, STREAMING_CONNECTED_ACTION, STREAMING_DISCONNECT_ACTION, STREAMING_DISCONNECTED_ACTION } from '../reducers/streamingActions';
+import { DisconnectedAction, ConnectAction, DisconnectAction, StreamingAction } from '../reducers/streamingActions';
+import { SubscribeToProductAction, STREAMING_SUBSCRIBE_TO_PRODUCT_ACTION, NewPriceAction } from '../reducers/pricerActions';
 
 
 export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$: Observable<RootState>) => {
