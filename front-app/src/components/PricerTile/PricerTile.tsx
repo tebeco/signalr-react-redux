@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch } from 'redux';
 import { RootState } from '../../store/rootState';
-import { StreamingAction } from '../../reducers/streamingActions';
+import { ConnectivityAction } from '../../reducers/connectivityActions';
 import { SubscribeToProductAction } from '../../reducers/pricerActions';
 import { SharedProductTileState } from '../../store/workspaceState';
 
@@ -37,7 +37,7 @@ const doSubscribe = (): SubscribeToProductAction => ({
     product: 'productId1',
 })
 
-const mapDispatchToProps = (dispatch: Dispatch<StreamingAction>) => bindActionCreators({ doSubscribe }, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>) => bindActionCreators({ doSubscribe }, dispatch);
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps) => {
     const pricerState = state.workspace.tiles[ownProps.id] as SharedProductTileState;

@@ -4,8 +4,8 @@ import { HubConnectionBuilder, LogLevel, HubConnection } from '@aspnet/signalr'
 import { ofType } from 'redux-observable';
 import { RootState } from '../store/rootState';
 import { RootAction } from '../store/rootActions';
-import { STREAMING_CONNECT_ACTION, STREAMING_CONNECTED_ACTION, STREAMING_DISCONNECT_ACTION, STREAMING_DISCONNECTED_ACTION } from '../reducers/streamingActions';
-import { DisconnectedAction, ConnectAction, DisconnectAction, StreamingAction } from '../reducers/streamingActions';
+import { SIGNALR_CONNECT_ACTION, SIGNALR_CONNECTED_ACTION, SIGNALR_DISCONNECT_ACTION, SIGNALR_DISCONNECTED_ACTION } from '../reducers/connectivityActions';
+import { DisconnectedAction, ConnectAction, DisconnectAction, ConnectivityAction } from '../reducers/connectivityActions';
 import { SubscribeToProductAction, STREAMING_SUBSCRIBE_TO_PRODUCT_ACTION, NewPriceAction } from '../reducers/pricerActions';
 
 
@@ -27,44 +27,44 @@ export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$
     subscribe$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
 
     hubConnection.onclose((err) => signalrEpicSubject.next({
-        type: STREAMING_DISCONNECTED_ACTION
+        type: SIGNALR_DISCONNECTED_ACTION
     }));
 
     return signalrEpicSubject;
 };
 
-const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<StreamingAction> => {
+const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<ConnectivityAction> => {
     return actions$.pipe(
-        ofType<RootAction, ConnectAction>(STREAMING_CONNECT_ACTION),
+        ofType<RootAction, ConnectAction>(SIGNALR_CONNECT_ACTION),
         mergeMap(_ => {
             return defer(async () => {
                 try {
                     await hubConnection.start()
                     return ({
-                        type: STREAMING_CONNECTED_ACTION
+                        type: SIGNALR_CONNECTED_ACTION
                     });
                 } catch (error) {
                     return ({
-                        type: STREAMING_DISCONNECTED_ACTION
+                        type: SIGNALR_DISCONNECTED_ACTION
                     });
                 }
             });
         }),
         map(action => {
-            return action as StreamingAction
+            return action as ConnectivityAction
         })
     )
 };
 
-const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<StreamingAction> => {
+const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<ConnectivityAction> => {
     return actions$.pipe(
-        ofType<RootAction, DisconnectAction>(STREAMING_DISCONNECT_ACTION),
+        ofType<RootAction, DisconnectAction>(SIGNALR_DISCONNECT_ACTION),
         mergeMap(_ => {
             return defer(async () => {
                 await hubConnection.stop();
 
                 return ({
-                    type: STREAMING_DISCONNECTED_ACTION
+                    type: SIGNALR_DISCONNECTED_ACTION
                 });
             });
         }),
