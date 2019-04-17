@@ -3,19 +3,21 @@ import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch } from 'redux';
 import { RootState } from '../../store/rootState';
 import { ConnectivityAction } from '../../reducers/connectivityActions';
-import { SubscribeToProductAction } from '../../reducers/pricerActions';
+import { SubscribeToSharedProductAction, subscribeToSharedProductAction } from '../../reducers/pricerActions';
 import { SharedProductTileState } from '../../store/workspaceState';
+import { StreamingConnectivityState } from '../../store/connectivityState';
 
 interface PricerTileProps {
     pricerId: string,
-    product: string,
+    productId: string,
     price: string,
+    connectivity: StreamingConnectivityState,
 
-    doSubscribe: () => SubscribeToProductAction,
+    doSubscribe: (productId: string) => SubscribeToSharedProductAction,
 }
 
 interface OwnProps {
-    id: string
+    id: string,
 }
 
 const PricerTileComponent = (props: PricerTileProps) => (
@@ -23,28 +25,28 @@ const PricerTileComponent = (props: PricerTileProps) => (
         Tile
         <p>
             id : '{props.pricerId}'<br />
-            product : '{props.product}'<br />
+            product id : '{props.productId}'<br />
             {props.price}
         </p>
-        <p>
-            <a onClick={props.doSubscribe}>Subscribe</a>
-        </p>
+        {
+            props.connectivity === "Connected" &&
+            <p>
+                <a onClick={() => props.doSubscribe(props.productId)}>Subscribe</a>
+            </p>
+        }
     </div>
 );
 
-const doSubscribe = (): SubscribeToProductAction => ({
-    type: 'STREAMING_SUBSCRIBE_TO_PRODUCT_ACTION',
-    product: 'productId1',
-})
-
-const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>) => bindActionCreators({ doSubscribe }, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>) => bindActionCreators({ doSubscribe: subscribeToSharedProductAction }, dispatch);
 
 const mapStateToProps = (state: RootState, ownProps: OwnProps) => {
     const pricerState = state.workspace.tiles[ownProps.id] as SharedProductTileState;
+    if (state.streaming.connectivity != "Connected") {pricerState.price = '-';}
     return {
         pricerId: pricerState.id,
-        product: pricerState.productId,
-        price: pricerState.price
+        productId: pricerState.productId,
+        price: pricerState.price,
+        connectivity: state.streaming.connectivity,
     }
 }
 

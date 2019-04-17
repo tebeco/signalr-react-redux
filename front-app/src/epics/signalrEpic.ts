@@ -4,9 +4,9 @@ import { HubConnectionBuilder, LogLevel, HubConnection } from '@aspnet/signalr'
 import { ofType } from 'redux-observable';
 import { RootState } from '../store/rootState';
 import { RootAction } from '../store/rootActions';
-import { SIGNALR_CONNECT_ACTION, SIGNALR_CONNECTED_ACTION, SIGNALR_DISCONNECT_ACTION, SIGNALR_DISCONNECTED_ACTION } from '../reducers/connectivityActions';
-import { DisconnectedAction, ConnectAction, DisconnectAction, ConnectivityAction } from '../reducers/connectivityActions';
-import { SubscribeToProductAction, STREAMING_SUBSCRIBE_TO_PRODUCT_ACTION, NewPriceAction } from '../reducers/pricerActions';
+import { SIGNALR_CONNECT_ACTION, SIGNALR_ON_CONNECTED_ACTION, SIGNALR_DISCONNECT_ACTION, SIGNALR_ON_DISCONNECTED_ACTION, onSignalRConnected, onSignalRDisconnected } from '../reducers/connectivityActions';
+import { ConnectAction, DisconnectAction, ConnectivityAction } from '../reducers/connectivityActions';
+import { SubscribeToSharedProductAction, SUBSCRIBE_TO_SHARED_PRODUCT_ACTION, SharedProductPriceAction, updateSharedProductPrice } from '../reducers/pricerActions';
 
 
 export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$: Observable<RootState>) => {
@@ -26,9 +26,7 @@ export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$
     diconnect$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
     subscribe$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
 
-    hubConnection.onclose((err) => signalrEpicSubject.next({
-        type: SIGNALR_DISCONNECTED_ACTION
-    }));
+    hubConnection.onclose((err) => signalrEpicSubject.next(onSignalRDisconnected()));
 
     return signalrEpicSubject;
 };
@@ -39,19 +37,13 @@ const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<
         mergeMap(_ => {
             return defer(async () => {
                 try {
-                    await hubConnection.start()
-                    return ({
-                        type: SIGNALR_CONNECTED_ACTION
-                    });
+                    await hubConnection.start();
+
+                    return onSignalRConnected();
                 } catch (error) {
-                    return ({
-                        type: SIGNALR_DISCONNECTED_ACTION
-                    });
+                    return onSignalRDisconnected();
                 }
             });
-        }),
-        map(action => {
-            return action as ConnectivityAction
         })
     )
 };
@@ -63,51 +55,33 @@ const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observab
             return defer(async () => {
                 await hubConnection.stop();
 
-                return ({
-                    type: SIGNALR_DISCONNECTED_ACTION
-                });
+                return onSignalRDisconnected();
             });
-        }),
-        map(action => {
-            return action as DisconnectedAction
         })
     )
 };
 
-interface ProductNewPrice {
-    id: string,
+interface SharedProductNewPrice {
+    productId: string,
     price: string
 }
-const handleSubscribeToProduct = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<NewPriceAction> => {
-    return actions$.pipe(
-        ofType<RootAction, SubscribeToProductAction>(STREAMING_SUBSCRIBE_TO_PRODUCT_ACTION),
-        mergeMap(action => {
-            return Observable.create((observer: Observer<NewPriceAction>) => {
-                const streamResult = hubConnection.stream<ProductNewPrice>("SubscribeToSharedProduct", action.product)
 
-                streamResult.subscribe({
-                    next: (msg) => {
-                        observer.next({
-                            type: 'NEW_PRICE_ACTION',
-                            product: msg.id,
-                            price: msg.price
-                        } as NewPriceAction);
-                    },
-                    error: (err) => {
-                        console.log(err);
-                        observer.complete();
-                    },
-                    complete: () => {
-                        observer.complete();
-                    }
-                });
-            }) as Observable<NewPriceAction>;
-        })
+const handleSubscribeToProduct = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<SharedProductPriceAction> => {
+    return actions$.pipe(
+        ofType<RootAction, SubscribeToSharedProductAction>(SUBSCRIBE_TO_SHARED_PRODUCT_ACTION),
+        mergeMap(action => {
+            return Observable.create((observer: Observer<SharedProductPriceAction>) => {
+                const streamResult = hubConnection.stream<SharedProductNewPrice>("SubscribeToSharedProduct", action.productId)
+
+                streamResult.subscribe(observer);
+            }) as Observable<SharedProductPriceAction>;
+        }),
+        map(action => updateSharedProductPrice(action.productId, action.price))
     );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//                                          UNSUBSCRIBE TO STREAM                                           //
+//                                        UNSUBSCRIBE TO STREAM                                           //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // subscription.dispose();

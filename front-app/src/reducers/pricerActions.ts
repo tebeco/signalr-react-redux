@@ -1,17 +1,30 @@
+import { streamingReducer } from "./connectivityReducer";
+
 export type PricerAction =
-    | SubscribeToProductAction
-    | NewPriceAction
+    | SubscribeToSharedProductAction
+    | SharedProductPriceAction
     ;
 
-export const STREAMING_SUBSCRIBE_TO_PRODUCT_ACTION = 'STREAMING_SUBSCRIBE_TO_PRODUCT_ACTION';
-export interface SubscribeToProductAction {
-    type: 'STREAMING_SUBSCRIBE_TO_PRODUCT_ACTION'
-    product: string
+export const SUBSCRIBE_TO_SHARED_PRODUCT_ACTION = 'SUBSCRIBE_TO_SHARED_PRODUCT_ACTION';
+export interface SubscribeToSharedProductAction {
+    type: 'SUBSCRIBE_TO_SHARED_PRODUCT_ACTION'
+    productId: string
 }
 
-export const NEW_PRICE_ACTION = 'NEW_PRICE_ACTION'
-export interface NewPriceAction {
-    type: 'NEW_PRICE_ACTION',
-    product: string
+export const SHARED_PRODUCT_PRICE_ACTION = 'SHARED_PRODUCT_PRICE_ACTION'
+export interface SharedProductPriceAction {
+    type: 'SHARED_PRODUCT_PRICE_ACTION',
+    productId: string
     price: string
 }
+
+export const subscribeToSharedProductAction = (productId: string): SubscribeToSharedProductAction => ({
+    type: 'SUBSCRIBE_TO_SHARED_PRODUCT_ACTION',
+    productId,
+});
+
+export const updateSharedProductPrice = (productId: string, price: string): SharedProductPriceAction => ({
+    type: 'SHARED_PRODUCT_PRICE_ACTION',
+    productId,
+    price,
+});

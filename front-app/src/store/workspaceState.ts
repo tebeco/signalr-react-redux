@@ -20,19 +20,17 @@ export interface WorkspaceState {
     tiles: Record<string, TileState>
 }
 
-const createDefaultSharedProductTile = (id: string, product: string): SharedProductTileState => ({ id, type: 'SHARED_PRODUCT_STATE', productId: product, price: '-' })
-
+const createDefaultSharedProductTile = (id: string, productId: string): SharedProductTileState => ({ id, type: 'SHARED_PRODUCT_STATE', productId, price: '-' });
+const createDefaultErrorTile = (id: string) : ErrorTileState => ({ id, type: 'ERROR_TILE_STATE' });
 const tiles: TileState[] = [
     createDefaultSharedProductTile('1', 'productId1'),
     createDefaultSharedProductTile('2', 'productId1'),
     createDefaultSharedProductTile('3', 'productId3'),
     createDefaultSharedProductTile('4', 'productId4'),
-    { id: '5', type: 'ERROR_TILE_STATE' },
+    createDefaultErrorTile('5'),
     createDefaultSharedProductTile('6', 'productId6'),
 ]
 
-const initialTiles = tiles.reduce((acc, current) => ({ ...acc, [current.id]: current }), {} as Record<string, TileState>)
-
 export const initialWorkspaceState = {
-    tiles: initialTiles,
+    tiles: tiles.reduce((acc, current) => ({ ...acc, [current.id]: current }), {} as Record<string, TileState>),
 };

@@ -8,12 +8,13 @@ export const streamingReducer = (state: ConnectivityState = initialStreamingStat
                 ...state,
                 connectivity: 'Connecting'
             };
-        case 'SIGNALR_CONNECTED_ACTION':
+        case 'SIGNALR_ON_CONNECTED_ACTION':
             return {
                 ...state,
                 connectivity: 'Connected'
             };
-        case 'SIGNALR_DISCONNECT_ACTION':
+            case 'SIGNALR_ON_DISCONNECTED_ACTION':
+            case 'SIGNALR_DISCONNECT_ACTION':
             return {
                 ...state,
                 connectivity: 'Disconnected'
