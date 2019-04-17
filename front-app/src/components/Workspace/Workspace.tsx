@@ -11,7 +11,7 @@ type WorkspaceProps = {
 const WorkspaceComponent = (props: WorkspaceProps) => {
     return (
         <div className="workspace">
-            {props.tileIds.map(id => (<Tile key={id} id={id} />))}
+            {props.tileIds.map(id => (<Tile key={id} tileId={id} />))}
         </div>
     )
 }

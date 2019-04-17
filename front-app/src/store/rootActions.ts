@@ -1,7 +1,7 @@
 import { ConnectivityAction } from "../reducers/connectivityActions";
-import { PricerAction } from "../reducers/pricerActions";
+import { ProductAction } from "../reducers/pricerActions";
 
 export type RootAction =
     | ConnectivityAction
-    | PricerAction
+    | ProductAction
     ;

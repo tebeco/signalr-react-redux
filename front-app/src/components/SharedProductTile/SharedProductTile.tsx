@@ -6,9 +6,10 @@ import { ConnectivityAction } from '../../reducers/connectivityActions';
 import { SubscribeToSharedProductAction, subscribeToSharedProductAction } from '../../reducers/pricerActions';
 import { SharedProductTileState } from '../../store/workspaceState';
 import { StreamingConnectivityState } from '../../store/connectivityState';
+import { TileOwnProps } from '../Tile/Tile';
 
-interface PricerTileProps {
-    pricerId: string,
+interface SharedProductTileProps {
+    tileId: string,
     productId: string,
     price: string,
     connectivity: StreamingConnectivityState,
@@ -16,15 +17,11 @@ interface PricerTileProps {
     doSubscribe: (productId: string) => SubscribeToSharedProductAction,
 }
 
-interface OwnProps {
-    id: string,
-}
-
-const PricerTileComponent = (props: PricerTileProps) => (
+const SharedProductTileComponent = (props: SharedProductTileProps) => (
     <div className="tile">
         Tile
         <p>
-            id : '{props.pricerId}'<br />
+            id : '{props.tileId}'<br />
             product id : '{props.productId}'<br />
             {props.price}
         </p>
@@ -39,15 +36,18 @@ const PricerTileComponent = (props: PricerTileProps) => (
 
 const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>) => bindActionCreators({ doSubscribe: subscribeToSharedProductAction }, dispatch);
 
-const mapStateToProps = (state: RootState, ownProps: OwnProps) => {
-    const pricerState = state.workspace.tiles[ownProps.id] as SharedProductTileState;
-    if (state.streaming.connectivity != "Connected") {pricerState.price = '-';}
-    return {
-        pricerId: pricerState.id,
-        productId: pricerState.productId,
-        price: pricerState.price,
+const mapStateToProps = (state: RootState, ownProps: TileOwnProps) : SharedProductTileProps => {
+    const sharedProductState = state.workspace.tiles[ownProps.tileId] as SharedProductTileState;
+
+    // TODO : This should be in a reducer
+    if (state.streaming.connectivity != "Connected") {sharedProductState.price = '-';}
+
+    return ({
+        tileId: sharedProductState.tileId,
+        productId: sharedProductState.productId,
+        price: sharedProductState.price,
         connectivity: state.streaming.connectivity,
-    }
+    }) as SharedProductTileProps;
 }
 
-export const PricerTile = connect(mapStateToProps, mapDispatchToProps)(PricerTileComponent);
+export const SharedProductTile = connect(mapStateToProps, mapDispatchToProps)(SharedProductTileComponent);

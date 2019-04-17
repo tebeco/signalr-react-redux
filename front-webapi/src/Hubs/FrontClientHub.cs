@@ -9,24 +9,34 @@ namespace Front.WebApi.Hubs
 {
     public class FrontClientHub : Hub
     {
-        private Dictionary<string, SharedProductPublisher> sharedProductPublisher = new Dictionary<string, SharedProductPublisher>();
+        private Dictionary<string, InfiniteProductPublisher> infiniteProductPublisher = new Dictionary<string, InfiniteProductPublisher>();
 
-        public ChannelReader<Product> SubscribeToSharedProduct(string productId)
+        public ChannelReader<Product> SubscribeToInfiniteProduct(string productId)
         {
-            if (!sharedProductPublisher.ContainsKey(productId))
+            if (!infiniteProductPublisher.ContainsKey(productId))
             {
-                sharedProductPublisher[productId] = new SharedProductPublisher(productId);
+                infiniteProductPublisher[productId] = new InfiniteProductPublisher(productId, TimeSpan.FromMilliseconds(200));
             }
 
-            return sharedProductPublisher[productId].ProductChannel.Reader;
+            return infiniteProductPublisher[productId].ProductChannel.Reader;
+        }
+
+        public ChannelReader<Product> SubscribeToUniqueProduct(string productId)
+        {
+            var publisher = new LimitedProductPublisher(productId, 3, TimeSpan.FromMilliseconds(200));
+            return publisher.ProductChannel.Reader;
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            var publishers = sharedProductPublisher.ToList();
-            sharedProductPublisher = new Dictionary<string, SharedProductPublisher>();
+            var publishers = infiniteProductPublisher.Values.ToList();
+            infiniteProductPublisher = new Dictionary<string, InfiniteProductPublisher>();
 
-            publishers.ForEach(publisher => publisher.Value.Dispose());
+            // Ludo me dit qu'une boucle while serait plus performant
+            // Mais je lui ai dit que je l'emmerde
+            // Il fera une prez' sur la partie PErformance en .Net ou il me montrera qu'en fait il avait raison
+            // En attedant je confirme "Je t'emmerde ludo"
+            publishers.ForEach(publisher => publisher.Dispose());
 
             return Task.CompletedTask;
         }

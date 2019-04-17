@@ -2,34 +2,36 @@ import React from 'react';
 import { connect } from "react-redux";
 import './Tile.css'
 import { RootState } from '../../store/rootState';
-import { PricerTile } from '../PricerTile/PricerTile';
 import { ErrorTile } from '../ErrorTile/ErrorTile';
-import { TileState, SHARED_PRODUCT_STATE } from '../../store/workspaceState';
-
+import { TileState } from '../../store/workspaceState';
+import { SharedProductTile } from '../SharedProductTile/SharedProductTile';
+import { UniqueProductTile } from '../UniqueProductTile/UniqueProductTile';
 
 interface TileProps {
-    id: string
+    tileId: string
     tileState: TileState
 }
 
-interface OwnProps {
-    id: string
+export interface TileOwnProps {
+    tileId: string,
 }
 
 const TileComponent = (props: TileProps) => {
-    if(props.tileState.type === SHARED_PRODUCT_STATE) {
-        return (<PricerTile id={props.id} />);
-    }
-    else {
-        return (<ErrorTile />);
+    switch (props.tileState.type) {
+        case 'SHARED_PRODUCT_STATE':
+            return (<SharedProductTile tileId={props.tileId} />);
+        case 'UNIQUE_PRODUCT_STATE':
+                return (<UniqueProductTile tileId={props.tileId} />);
+        default:
+            return (<ErrorTile />);
     }
 };
 
-const mapStateToProps = (state: RootState, ownProps: OwnProps): TileProps => {
-    return { 
-        id: ownProps.id,
-        tileState: state.workspace.tiles[ownProps.id]
-     }
+const mapStateToProps = (state: RootState, tileOwnProps: TileOwnProps): TileProps => {
+    return {
+        tileId: tileOwnProps.tileId,
+        tileState: state.workspace.tiles[tileOwnProps.tileId]
+    }
 }
 
 export const Tile = connect(mapStateToProps)(TileComponent);
