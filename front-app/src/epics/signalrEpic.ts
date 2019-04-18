@@ -1,10 +1,10 @@
 import { Observable, defer, Subject, Observer } from 'rxjs';
-import { mergeMap, map } from 'rxjs/operators';
+import { mergeMap, map, tap } from 'rxjs/operators';
 import { HubConnectionBuilder, LogLevel, HubConnection } from '@aspnet/signalr'
 import { ofType } from 'redux-observable';
 import { RootState } from '../store/rootState';
 import { RootAction } from '../store/rootActions';
-import { SIGNALR_CONNECT_ACTION, SIGNALR_ON_CONNECTED_ACTION, SIGNALR_DISCONNECT_ACTION, SIGNALR_ON_DISCONNECTED_ACTION, onSignalRConnected, onSignalRDisconnected } from '../reducers/connectivityActions';
+import { SIGNALR_CONNECT_ACTION, SIGNALR_DISCONNECT_ACTION, onSignalRConnected, onSignalRDisconnected, onSignalRDisconnecting } from '../reducers/connectivityActions';
 import { ConnectAction, DisconnectAction, ConnectivityAction } from '../reducers/connectivityActions';
 import { SubscribeToInfiniteProductAction, SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION, InfiniteProductPriceAction, updateInfiniteProductPrice, SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION, SubscribeToLimitedProductAction, LimitedProductPriceAction, updateLimitedProductPrice } from '../reducers/pricerActions';
 
@@ -27,9 +27,10 @@ export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$
     diconnect$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
     subscribeToInfiniteProduct$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
     subscribeToLimitedProduct$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
-    
-    console.log("on close");
-    hubConnection.onclose((err) => signalrEpicSubject.next(onSignalRDisconnected()));
+
+    hubConnection.onclose((err) => {
+        signalrEpicSubject.next(onSignalRDisconnected());
+    });
 
     return signalrEpicSubject;
 };
@@ -40,7 +41,6 @@ const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<
         mergeMap(_ => {
             return defer(async () => {
                 try {
-                    console.log("start");
                     await hubConnection.start();
 
                     return onSignalRConnected();
@@ -55,15 +55,8 @@ const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<
 const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<ConnectivityAction> => {
     return actions$.pipe(
         ofType<RootAction, DisconnectAction>(SIGNALR_DISCONNECT_ACTION),
-        mergeMap(_ => {
-            return defer(async () => {
-                console.log("stop");
-
-                await hubConnection.stop();
-
-                return onSignalRDisconnected();
-            });
-        })
+        map(_ => onSignalRDisconnecting()),
+        tap(_ => hubConnection.stop())
     )
 };
 
@@ -77,17 +70,15 @@ const handleSubscribeToInfiniteProduct = (hubConnection: HubConnection, actions$
         ofType<RootAction, SubscribeToInfiniteProductAction>(SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION),
         mergeMap(action => {
             return Observable.create((observer: Observer<InfiniteProductPriceAction>) => {
-                console.log("stream");
                 const streamResult = hubConnection.stream<InfiniteProductNewPrice>("SubscribeToInfiniteProduct", action.productId)
 
-                console.log("subscribe");
                 streamResult.subscribe(observer);
+
             }) as Observable<InfiniteProductPriceAction>;
         }),
         map(action => updateInfiniteProductPrice(action.productId, action.price))
     );
 };
-
 
 interface LimitedProductNewPrice {
     productId: string,
