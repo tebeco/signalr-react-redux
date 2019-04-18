@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Channels;
@@ -7,14 +8,14 @@ namespace Front.WebApi.Hubs
 {
     public class InfiniteProductPublisher : IDisposable
     {
-        private readonly IDisposable subscription;
+        private readonly IDisposable _subscription;
 
         public Channel<Product> ProductChannel { get; }
 
         public InfiniteProductPublisher(string productId, TimeSpan interval)
         {
             ProductChannel = Channel.CreateUnbounded<Product>();
-            subscription = Observable.Interval(interval)
+            _subscription = Observable.Interval(interval)
                                     .Select((_, index) => Product.GetRandomProduct(productId))
                                     .Subscribe(
                                        product => ProductChannel.Writer.TryWrite(product),
@@ -27,7 +28,7 @@ namespace Front.WebApi.Hubs
         public void Dispose()
         {
             ProductChannel.Writer.Complete();
-            subscription.Dispose();
+            _subscription.Dispose();
         }
     }
 }
