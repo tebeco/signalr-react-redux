@@ -1,9 +1,9 @@
-import { UniqueProductTile } from "../components/UniqueProductTile/UniqueProductTile";
+import { LimitedProductTile } from "../components/LimitedProductTile/LimitedProductTile";
 
 export type TileState =
     | ErrorTileState
-    | SharedProductTileState
-    | UniqueProductTileState
+    | InfinteProductTileState
+    | LimitedProductTileState
     ;
 
 export const ERROR_TILE_STATE = 'ERROR_TILE_STATE';
@@ -12,17 +12,17 @@ export interface ErrorTileState {
     tileId: string;
 }
 
-export const SHARED_PRODUCT_STATE = 'SHARED_PRODUCT_STATE';
-export interface SharedProductTileState {
-    type: 'SHARED_PRODUCT_STATE'
+export const INFINITE_PRODUCT_STATE = 'INFINITE_PRODUCT_STATE';
+export interface InfinteProductTileState {
+    type: 'INFINITE_PRODUCT_STATE'
     tileId: string;
     productId: string;
     price: string | '-';
 }
 
-export const UNIQUE_PRODUCT_STATE = 'UNIQUE_PRODUCT_STATE';
-export interface UniqueProductTileState {
-    type : 'UNIQUE_PRODUCT_STATE'
+export const LIMITED_PRODUCT_STATE = 'LIMITED_PRODUCT_STATE';
+export interface LimitedProductTileState {
+    type : 'LIMITED_PRODUCT_STATE'
     tileId: string;
     productId: string;
     price: string | '-';
@@ -32,15 +32,15 @@ export interface WorkspaceState {
     tiles: Record<string, TileState>
 }
 
-const createDefaultSharedProductTile = (tileId: string, productId: string): SharedProductTileState => ({ tileId, type: 'SHARED_PRODUCT_STATE', productId, price: '-' });
-const createDefaultUniqueProductTile = (tileId: string, productId: string): UniqueProductTileState => ({ tileId, type: 'UNIQUE_PRODUCT_STATE', productId, price: '-' });
+const createDefaultInfinteProductTile = (tileId: string, productId: string): InfinteProductTileState => ({ tileId, type: 'INFINITE_PRODUCT_STATE', productId, price: '-' });
+const createDefaultLimitedProductTile = (tileId: string, productId: string): LimitedProductTileState => ({ tileId, type: 'LIMITED_PRODUCT_STATE', productId, price: '-' });
 
 const createDefaultErrorTile = (tileId: string) : ErrorTileState => ({ tileId, type: 'ERROR_TILE_STATE' });
 
 const tiles: TileState[] = [
-    createDefaultSharedProductTile('1', 'productId1'),
-    createDefaultSharedProductTile('2', 'productId1'),
-    createDefaultUniqueProductTile('3', 'productId3'),
+    createDefaultInfinteProductTile('1', 'productId1'),
+    createDefaultInfinteProductTile('2', 'productId1'),
+    createDefaultLimitedProductTile('3', 'productId3'),
     createDefaultErrorTile('4'),
 ];
 

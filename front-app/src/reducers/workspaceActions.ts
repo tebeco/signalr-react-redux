@@ -1,4 +1,4 @@
-export const ADD_SHARED_PRODUCT_TILE = 'ADD_SHARED_PRODUCT_TILE'
-export interface AddSharedProductTile {
-    type: 'ADD_SHARED_PRODUCT_TILE'
+export const ADD_INFINITE_PRODUCT_TILE = 'ADD_INFINITE_PRODUCT_TILE'
+export interface AddInfinteProductTile {
+    type: 'ADD_INFINITE_PRODUCT_TILE'
 }

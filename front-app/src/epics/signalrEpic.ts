@@ -6,7 +6,7 @@ import { RootState } from '../store/rootState';
 import { RootAction } from '../store/rootActions';
 import { SIGNALR_CONNECT_ACTION, SIGNALR_ON_CONNECTED_ACTION, SIGNALR_DISCONNECT_ACTION, SIGNALR_ON_DISCONNECTED_ACTION, onSignalRConnected, onSignalRDisconnected } from '../reducers/connectivityActions';
 import { ConnectAction, DisconnectAction, ConnectivityAction } from '../reducers/connectivityActions';
-import { SubscribeToSharedProductAction, SUBSCRIBE_TO_SHARED_PRODUCT_ACTION, SharedProductPriceAction, updateSharedProductPrice, SUBSCRIBE_TO_UNIQUE_PRODUCT_ACTION, SubscribeToUniqueProductAction, UniqueProductPriceAction, updateUniqueProductPrice } from '../reducers/pricerActions';
+import { SubscribeToInfiniteProductAction, SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION, InfiniteProductPriceAction, updateInfiniteProductPrice, SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION, SubscribeToLimitedProductAction, LimitedProductPriceAction, updateLimitedProductPrice } from '../reducers/pricerActions';
 
 
 export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$: Observable<RootState>) => {
@@ -20,14 +20,15 @@ export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$
 
     const connect$ = handleConnectAction(hubConnection, actions$, state$);
     const diconnect$ = handleDisconnectAction(hubConnection, actions$, state$);
-    const subscribeToSharedProduct$ = handleSubscribeToSharedProduct(hubConnection, actions$, state$);
-    const subscribeToUniqueProduct$ = handleSubscribeToUniqueProduct(hubConnection, actions$, state$);
+    const subscribeToInfiniteProduct$ = handleSubscribeToInfiniteProduct(hubConnection, actions$, state$);
+    const subscribeToLimitedProduct$ = handleSubscribeToLimitedProduct(hubConnection, actions$, state$);
 
     connect$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
     diconnect$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
-    subscribeToSharedProduct$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
-    subscribeToUniqueProduct$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
+    subscribeToInfiniteProduct$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
+    subscribeToLimitedProduct$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
     
+    console.log("on close");
     hubConnection.onclose((err) => signalrEpicSubject.next(onSignalRDisconnected()));
 
     return signalrEpicSubject;
@@ -39,6 +40,7 @@ const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<
         mergeMap(_ => {
             return defer(async () => {
                 try {
+                    console.log("start");
                     await hubConnection.start();
 
                     return onSignalRConnected();
@@ -55,6 +57,8 @@ const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observab
         ofType<RootAction, DisconnectAction>(SIGNALR_DISCONNECT_ACTION),
         mergeMap(_ => {
             return defer(async () => {
+                console.log("stop");
+
                 await hubConnection.stop();
 
                 return onSignalRDisconnected();
@@ -63,42 +67,44 @@ const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observab
     )
 };
 
-interface SharedProductNewPrice {
+interface InfiniteProductNewPrice {
     productId: string,
     price: string
 }
 
-const handleSubscribeToSharedProduct = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<SharedProductPriceAction> => {
+const handleSubscribeToInfiniteProduct = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<InfiniteProductPriceAction> => {
     return actions$.pipe(
-        ofType<RootAction, SubscribeToSharedProductAction>(SUBSCRIBE_TO_SHARED_PRODUCT_ACTION),
+        ofType<RootAction, SubscribeToInfiniteProductAction>(SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION),
         mergeMap(action => {
-            return Observable.create((observer: Observer<SharedProductPriceAction>) => {
-                const streamResult = hubConnection.stream<SharedProductNewPrice>("SubscribeToSharedProduct", action.productId)
+            return Observable.create((observer: Observer<InfiniteProductPriceAction>) => {
+                console.log("stream");
+                const streamResult = hubConnection.stream<InfiniteProductNewPrice>("SubscribeToInfiniteProduct", action.productId)
 
+                console.log("subscribe");
                 streamResult.subscribe(observer);
-            }) as Observable<SharedProductPriceAction>;
+            }) as Observable<InfiniteProductPriceAction>;
         }),
-        map(action => updateSharedProductPrice(action.productId, action.price))
+        map(action => updateInfiniteProductPrice(action.productId, action.price))
     );
 };
 
-interface UniqueProductNewPrice {
+
+interface LimitedProductNewPrice {
     productId: string,
     price: string
 }
 
-const handleSubscribeToUniqueProduct = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<UniqueProductPriceAction> => {
+const handleSubscribeToLimitedProduct = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: Observable<RootState>): Observable<LimitedProductPriceAction> => {
     return actions$.pipe(
-        ofType<RootAction, SubscribeToUniqueProductAction>(SUBSCRIBE_TO_UNIQUE_PRODUCT_ACTION),
+        ofType<RootAction, SubscribeToLimitedProductAction>(SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION),
         mergeMap(action => {
-            console.log('dfsfdsf')
-            return Observable.create((observer: Observer<UniqueProductPriceAction>) => {
-                const streamResult = hubConnection.stream<UniqueProductNewPrice>("SubscribeToUniqueProduct", action.productId)
+            return Observable.create((observer: Observer<LimitedProductPriceAction>) => {
+                const streamResult = hubConnection.stream<LimitedProductNewPrice>("SubscribeToLimitedProduct", action.productId)
 
                 streamResult.subscribe(observer);
-            }) as Observable<UniqueProductPriceAction>;
+            }) as Observable<LimitedProductPriceAction>;
         }),
-        map(action => updateUniqueProductPrice(action.productId, action.price))
+        map(action => updateLimitedProductPrice(action.productId, action.price))
     );
 };
 

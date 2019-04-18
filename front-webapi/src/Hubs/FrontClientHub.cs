@@ -21,7 +21,14 @@ namespace Front.WebApi.Hubs
             return infiniteProductPublisher[productId].ProductChannel.Reader;
         }
 
-        public ChannelReader<Product> SubscribeToUniqueProduct(string productId)
+        // Ludo me dit que faire un analyzer roslyn
+        // * qui genere un package npm a chaque build
+        // * cree les typings equivalent aux methodes du hub "on the fly"
+        // * et du coup permettrai de failfast la compile du front lors de rename
+        // Mais je lui ai dit que je l'emmerde
+        // Il fera une prez' sur "Les analyzer Roslyn en .net" ou il me montrera qu'en fait il avait raison
+        // En attendant je confirme "Je t'emmerde ludo"
+        public ChannelReader<Product> SubscribeToLimitedProduct(string productId)
         {
             var publisher = new LimitedProductPublisher(productId, 3, TimeSpan.FromMilliseconds(200));
             return publisher.ProductChannel.Reader;

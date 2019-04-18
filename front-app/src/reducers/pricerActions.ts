@@ -1,72 +1,72 @@
 import { streamingReducer } from "./connectivityReducer";
 
 export type ProductAction =
-    | SharedProductAction
-    | UniqueProductAction
+    | InfinteProductAction
+    | LimitedProductAction
     ;
 
 ////////////////////////////////////////////
-////////////////////// UNIQUE PRODUCT
+////////////////////// INFINITE PRODUCT
 ////////////////////////////////////////////
 
-type SharedProductAction = 
-    | SubscribeToSharedProductAction
-    | SharedProductPriceAction
+type InfinteProductAction = 
+    | SubscribeToInfiniteProductAction
+    | InfiniteProductPriceAction
     ;
 
-export const SUBSCRIBE_TO_SHARED_PRODUCT_ACTION = 'SUBSCRIBE_TO_SHARED_PRODUCT_ACTION';
-export interface SubscribeToSharedProductAction {
-    type: 'SUBSCRIBE_TO_SHARED_PRODUCT_ACTION'
+export const SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION = 'SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION';
+export interface SubscribeToInfiniteProductAction {
+    type: 'SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION'
     productId: string
 }
 
-export const SHARED_PRODUCT_PRICE_ACTION = 'SHARED_PRODUCT_PRICE_ACTION'
-export interface SharedProductPriceAction {
-    type: 'SHARED_PRODUCT_PRICE_ACTION',
+export const INFINITE_PRODUCT_PRICE_ACTION = 'INFINITE_PRODUCT_PRICE_ACTION'
+export interface InfiniteProductPriceAction {
+    type: 'INFINITE_PRODUCT_PRICE_ACTION',
     productId: string
     price: string
 }
 
-export const subscribeToSharedProductAction = (productId: string): SubscribeToSharedProductAction => ({
-    type: 'SUBSCRIBE_TO_SHARED_PRODUCT_ACTION',
+export const subscribeToInfiniteProductAction = (productId: string): SubscribeToInfiniteProductAction => ({
+    type: 'SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION',
     productId,
 });
 
-export const updateSharedProductPrice = (productId: string, price: string): SharedProductPriceAction => ({
-    type: 'SHARED_PRODUCT_PRICE_ACTION',
+export const updateInfiniteProductPrice = (productId: string, price: string): InfiniteProductPriceAction => ({
+    type: 'INFINITE_PRODUCT_PRICE_ACTION',
     productId,
     price,
 });
 
 ////////////////////////////////////////////
-////////////////////// UNIQUE PRODUCT
+////////////////////// LIMITED PRODUCT
 ////////////////////////////////////////////
 
-type UniqueProductAction = 
-    | SubscribeToUniqueProductAction
-    | UniqueProductPriceAction
+type LimitedProductAction = 
+    | SubscribeToLimitedProductAction
+    | LimitedProductPriceAction
     ;
 
-export const SUBSCRIBE_TO_UNIQUE_PRODUCT_ACTION = 'SUBSCRIBE_TO_UNIQUE_PRODUCT_ACTION';
-export interface SubscribeToUniqueProductAction {
-    type: 'SUBSCRIBE_TO_UNIQUE_PRODUCT_ACTION'
+export const SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION = 'SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION';
+export interface SubscribeToLimitedProductAction {
+    type: 'SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION'
     productId: string
 }
 
-export const UNIQUE_PRODUCT_PRICE_ACTION = 'UNIQUE_PRODUCT_PRICE_ACTION'
-export interface UniqueProductPriceAction {
-    type: 'UNIQUE_PRODUCT_PRICE_ACTION',
+export const LIMITED_PRODUCT_PRICE_ACTION = 'LIMITED_PRODUCT_PRICE_ACTION'
+export interface LimitedProductPriceAction {
+    type: 'LIMITED_PRODUCT_PRICE_ACTION',
     productId: string
     price: string
 }
 
-export const subscribeToUniqueProductAction = (productId: string): SubscribeToUniqueProductAction => ({
-    type: 'SUBSCRIBE_TO_UNIQUE_PRODUCT_ACTION',
+export const subscribeToLimitedProductAction = (productId: string): SubscribeToLimitedProductAction => ({
+    type: 'SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION',
     productId,
 });
 
-export const updateUniqueProductPrice = (productId: string, price: string): UniqueProductPriceAction => ({
-    type: 'UNIQUE_PRODUCT_PRICE_ACTION',
+export const updateLimitedProductPrice = (productId: string, price: string): LimitedProductPriceAction => ({
+    type: 'LIMITED_PRODUCT_PRICE_ACTION',
     productId,
     price,
 });
