@@ -7,14 +7,14 @@ namespace Front.WebApi.Hubs
 {
     public class InfiniteProductPublisher : IDisposable
     {
-        private readonly IDisposable subsribtion;
+        private readonly IDisposable subscription;
 
         public Channel<Product> ProductChannel { get; }
 
         public InfiniteProductPublisher(string productId, TimeSpan interval)
         {
             ProductChannel = Channel.CreateUnbounded<Product>();
-            subsribtion = Observable.Interval(interval)
+            subscription = Observable.Interval(interval)
                                     .Select((_, index) => Product.GetRandomProduct(productId))
                                     .Subscribe(
                                        product => ProductChannel.Writer.TryWrite(product),
@@ -27,7 +27,7 @@ namespace Front.WebApi.Hubs
         public void Dispose()
         {
             ProductChannel.Writer.Complete();
-            subsribtion.Dispose();
+            subscription.Dispose();
         }
     }
 }

@@ -34,8 +34,8 @@ namespace Front.WebApi.Hubs
 
             // Ludo me dit qu'une boucle while serait plus performant
             // Mais je lui ai dit que je l'emmerde
-            // Il fera une prez' sur la partie PErformance en .Net ou il me montrera qu'en fait il avait raison
-            // En attedant je confirme "Je t'emmerde ludo"
+            // Il fera une prez' sur la partie Performance en .Net ou il me montrera qu'en fait il avait raison
+            // En attendant je confirme "Je t'emmerde ludo"
             publishers.ForEach(publisher => publisher.Dispose());
 
             return Task.CompletedTask;
