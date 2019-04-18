@@ -8,16 +8,18 @@ import { InfinteProductTileState } from '../../store/workspaceState';
 import { StreamingConnectivityState } from '../../store/connectivityState';
 import { TileOwnProps } from '../Tile/Tile';
 
-interface InfinteProductTileProps {
+interface InfinteProductTileStateProps {
     tileId: string,
     productId: string,
     price: string,
     connectivity: StreamingConnectivityState,
-
-    doSubscribe: (productId: string) => SubscribeToInfiniteProductAction,
 }
 
-const InfinteProductTileComponent = (props: InfinteProductTileProps) => (
+interface InfinteProductTileDispatchProps {
+    subscribeToInfiniteProductAction: (productId: string) => SubscribeToInfiniteProductAction,
+}
+
+const InfinteProductTileComponent = (props: InfinteProductTileStateProps & InfinteProductTileDispatchProps) => (
     <div className="tile">
         Tile
         <p>
@@ -28,23 +30,23 @@ const InfinteProductTileComponent = (props: InfinteProductTileProps) => (
         {
             props.connectivity === "Connected" &&
             <p>
-                <a onClick={() => props.doSubscribe(props.productId)}>Subscribe</a>
+                <a onClick={() => props.subscribeToInfiniteProductAction(props.productId)}>Subscribe</a>
             </p>
         }
     </div>
 );
 
-const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>) => bindActionCreators({ doSubscribe: subscribeToInfiniteProductAction }, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>) => bindActionCreators({ subscribeToInfiniteProductAction }, dispatch);
 
-const mapStateToProps = (state: RootState, ownProps: TileOwnProps) : InfinteProductTileProps => {
+const mapStateToProps = (state: RootState, ownProps: TileOwnProps) : InfinteProductTileStateProps => {
     const limitedProductState = state.workspace.tiles[ownProps.tileId] as InfinteProductTileState;
 
-    return ({
+    return {
         tileId: limitedProductState.tileId,
         productId: limitedProductState.productId,
         price: limitedProductState.price,
         connectivity: state.streaming.connectivity,
-    }) as InfinteProductTileProps;
+    };
 }
 
 export const InfinteProductTile = connect(mapStateToProps, mapDispatchToProps)(InfinteProductTileComponent);

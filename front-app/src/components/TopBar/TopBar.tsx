@@ -3,22 +3,22 @@ import './TopBar.css'
 import { connect } from "react-redux";
 import { Dispatch, bindActionCreators } from 'redux';
 import { RootState } from "../../store/rootState";
-import { ConnectAction, ConnectivityAction, DisconnectAction } from '../../reducers/connectivityActions';
+import { ConnectAction, ConnectivityAction, DisconnectAction, connectToSignalR, disconnectFromSignalR } from '../../reducers/connectivityActions';
 import { StreamingConnectivityState } from '../../store/connectivityState';
 
-const getConnectivityButton = (props: TopBarProps): JSX.Element => {
+const getConnectivityButton = (props: TopBarStateProps & TopBarDispacthProps): JSX.Element => {
     switch (props.appConnectivity) {
         case 'Connected':
         case 'Connecting':
-            return (<a onClick={props.doDisconnect}>Disconnect</a>);
+            return (<a onClick={props.disconnectFromSignalR}>Disconnect</a>);
         case 'Disconnected':
-            return (<a onClick={props.doConnect}>Connect</a>);
+            return (<a onClick={props.connectToSignalR}>Connect</a>);
         default:
             throw "unhandled connectivity state";
     }
 }
 
-const getConnectivityLogoColor = (props: TopBarProps) => {
+const getConnectivityLogoColor = (props: TopBarStateProps) => {
     switch (props.appConnectivity) {
         case 'Connected':
             return '#00FF99';
@@ -31,7 +31,7 @@ const getConnectivityLogoColor = (props: TopBarProps) => {
     };
 };
 
-const TopBarComponent = (props: TopBarProps) => {
+const TopBarComponent = (props: TopBarStateProps & TopBarDispacthProps) => {
     const color = getConnectivityLogoColor(props);
     return (
         <div className="TopBar">
@@ -52,25 +52,20 @@ const TopBarComponent = (props: TopBarProps) => {
     );
 };
 
-type TopBarProps = {
+interface TopBarStateProps {
     appConnectivity: StreamingConnectivityState;
-    doConnect: () => ConnectAction;
-    doDisconnect: () => DisconnectAction;
+}
+interface TopBarDispacthProps {
+    connectToSignalR: () => ConnectAction;
+    disconnectFromSignalR: () => DisconnectAction;
 };
 
-const doConnect = (): ConnectAction => ({
-    type: 'SIGNALR_CONNECT_ACTION'
-});
 
-const doDisconnect = (): DisconnectAction => ({
-    type: 'SIGNALR_DISCONNECT_ACTION'
-});
-
-const mapStateToProps = (state: RootState) => ({
+const mapStateToProps = (state: RootState): TopBarStateProps => ({
     appConnectivity: state.streaming.connectivity,
 });
 
-const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>) => bindActionCreators({ doConnect, doDisconnect }, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>) => bindActionCreators({ connectToSignalR, disconnectFromSignalR }, dispatch);
 
 
 export const TopBar = connect(mapStateToProps, mapDispatchToProps)(TopBarComponent);

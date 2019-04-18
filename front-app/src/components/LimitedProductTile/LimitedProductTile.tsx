@@ -16,7 +16,7 @@ interface LimitedProductTileStateProps {
 }
 
 interface LimitedProductTileDispatchProps {
-    doSubscribe: (productId: string) => SubscribeToLimitedProductAction,
+    subscribeToLimitedProductAction: (productId: string) => SubscribeToLimitedProductAction,
 }
 
 const LimitedProductTileComponent = (props: LimitedProductTileStateProps & LimitedProductTileDispatchProps) => (
@@ -30,13 +30,13 @@ const LimitedProductTileComponent = (props: LimitedProductTileStateProps & Limit
         {
             props.connectivity === "Connected" &&
             <p>
-                <a onClick={() => props.doSubscribe(props.productId)}>Subscribe</a>
+                <a onClick={() => props.subscribeToLimitedProductAction(props.productId)}>Subscribe</a>
             </p>
         }
     </div>
 );
 
-const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>): LimitedProductTileDispatchProps => bindActionCreators({ doSubscribe: subscribeToLimitedProductAction }, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>): LimitedProductTileDispatchProps => bindActionCreators({ subscribeToLimitedProductAction }, dispatch);
 
 const mapStateToProps = (state: RootState, ownProps: TileOwnProps): LimitedProductTileStateProps => {
     const limitedProductState = state.workspace.tiles[ownProps.tileId] as LimitedProductTileState;

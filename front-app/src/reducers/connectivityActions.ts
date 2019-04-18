@@ -16,6 +16,16 @@ export interface DisconnectAction {
     type: 'SIGNALR_DISCONNECT_ACTION'
 };
 
+export const connectToSignalR = (): ConnectAction => ({
+    type: 'SIGNALR_CONNECT_ACTION'
+});
+
+export const disconnectFromSignalR = (): DisconnectAction => ({
+    type: 'SIGNALR_DISCONNECT_ACTION'
+});
+
+/////////////////////////
+
 export const SIGNALR_ON_CONNECTED_ACTION = 'SIGNALR_ON_CONNECTED_ACTION';
 export interface OnConnectedAction {
     type: 'SIGNALR_ON_CONNECTED_ACTION'
