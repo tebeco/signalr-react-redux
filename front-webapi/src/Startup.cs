@@ -28,7 +28,7 @@ namespace Front.WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddMvc()
+                .AddControllers()
                 .AddNewtonsoftJson();
 
             services.AddCors();
@@ -59,14 +59,13 @@ namespace Front.WebApi
             }
 
             app.UseHttpsRedirection();
-            app.UseRouting(routes =>
-            {
-                routes.MapHub<FrontClientHub>("/clients");
-
-                routes.MapControllers();
-            });
-
+            app.UseRouting();
             app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<FrontClientHub>("/clients");
+                endpoints.MapControllers();
+            });
         }
     }
 }
