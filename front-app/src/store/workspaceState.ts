@@ -1,5 +1,3 @@
-import { LimitedProductTile } from "../components/LimitedProductTile/LimitedProductTile";
-
 export type TileState =
     | ErrorTileState
     | InfinteProductTileState

@@ -5,14 +5,14 @@ import { RootState } from '../../store/rootState';
 import { ConnectivityAction } from '../../reducers/connectivityActions';
 import { SubscribeToLimitedProductAction, subscribeToLimitedProductAction } from '../../reducers/pricerActions';
 import { LimitedProductTileState } from '../../store/workspaceState';
-import { StreamingConnectivityState } from '../../store/connectivityState';
+import { ConnectivityStateType } from '../../store/connectivityState';
 import { TileOwnProps } from '../Tile/Tile';
 
 interface LimitedProductTileStateProps {
     tileId: string,
     productId: string,
     price: string,
-    connectivity: StreamingConnectivityState,
+    connectivity: ConnectivityStateType,
 }
 
 interface LimitedProductTileDispatchProps {
@@ -45,7 +45,7 @@ const mapStateToProps = (state: RootState, ownProps: TileOwnProps): LimitedProdu
         tileId: limitedProductState.tileId,
         productId: limitedProductState.productId,
         price: limitedProductState.price,
-        connectivity: state.streaming.connectivity,
+        connectivity: state.connectivity.connectivity,
     }
 }
 

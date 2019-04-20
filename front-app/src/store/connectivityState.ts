@@ -2,15 +2,15 @@ export type ConnectedState = 'Connected';
 export type ConnectingState = 'Connecting';
 export type DisconnectedState = 'Disconnected';
 
-export type StreamingConnectivityState =
+export type ConnectivityStateType =
     | ConnectedState
     | ConnectingState
     | DisconnectedState;
 
 export interface ConnectivityState {
-    connectivity: StreamingConnectivityState
+    connectivity: ConnectivityStateType
 };
 
-export const initialStreamingState: ConnectivityState = {
+export const initialConnectivityState: ConnectivityState = {
     connectivity: 'Disconnected'
 };

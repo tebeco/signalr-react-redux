@@ -7,7 +7,7 @@ import connectedLogo from './logos/connected-logo.svg';
 import disconnectedLogo from './logos/disconnected-logo.svg';
 import { RootState } from "../../store/rootState";
 import { ConnectAction, ConnectivityAction, DisconnectAction, connectToSignalR, disconnectFromSignalR } from '../../reducers/connectivityActions';
-import { StreamingConnectivityState } from '../../store/connectivityState';
+import { ConnectivityStateType } from '../../store/connectivityState';
 
 const getConnectivityButton = (props: TopBarStateProps & TopBarDispacthProps): JSX.Element => {
     switch (props.appConnectivity) {
@@ -57,7 +57,7 @@ const TopBarComponent = (props: TopBarStateProps & TopBarDispacthProps) => {
 };
 
 interface TopBarStateProps {
-    appConnectivity: StreamingConnectivityState;
+    appConnectivity: ConnectivityStateType;
 }
 interface TopBarDispacthProps {
     connectToSignalR: () => ConnectAction;
@@ -66,7 +66,7 @@ interface TopBarDispacthProps {
 
 
 const mapStateToProps = (state: RootState): TopBarStateProps => ({
-    appConnectivity: state.streaming.connectivity,
+    appConnectivity: state.connectivity.connectivity,
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>) => bindActionCreators({ connectToSignalR, disconnectFromSignalR }, dispatch);

@@ -1,12 +1,15 @@
-import { ConnectivityState, initialStreamingState } from "./connectivityState";
+import { ConnectivityState, initialConnectivityState } from "./connectivityState";
 import { WorkspaceState, initialWorkspaceState } from "./workspaceState";
+import { StreamingState, initialStreamingState } from "./streamingState";
 
 export interface RootState {
-    streaming: ConnectivityState
-    workspace: WorkspaceState
+    connectivity: ConnectivityState,
+    workspace: WorkspaceState,
+    streaming: StreamingState
 };
 
 export const initialRootState: RootState = {
+    connectivity: initialConnectivityState,
+    workspace: initialWorkspaceState,
     streaming: initialStreamingState,
-    workspace: initialWorkspaceState
 }
