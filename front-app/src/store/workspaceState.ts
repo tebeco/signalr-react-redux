@@ -32,12 +32,12 @@ export interface WorkspaceState {
     tiles: Record<string, TileState>
 }
 
+
 const createDefaultInfinteProductTile = (tileId: string, productId: string): InfinteProductTileState => ({ tileId, type: 'INFINITE_PRODUCT_STATE', productId, price: '-' });
 const createDefaultLimitedProductTile = (tileId: string, productId: string): LimitedProductTileState => ({ tileId, type: 'LIMITED_PRODUCT_STATE', productId, price: '-' });
-
 const createDefaultErrorTile = (tileId: string) : ErrorTileState => ({ tileId, type: 'ERROR_TILE_STATE' });
 
-const tiles: TileState[] = [
+const initialTiles: TileState[] = [
     createDefaultInfinteProductTile('1', 'productId1'),
     createDefaultInfinteProductTile('2', 'productId1'),
     createDefaultLimitedProductTile('3', 'productId3'),
@@ -45,5 +45,5 @@ const tiles: TileState[] = [
 ];
 
 export const initialWorkspaceState = {
-    tiles: tiles.reduce((acc, current) => ({ ...acc, [current.tileId]: current }), {} as Record<string, TileState>),
+    tiles: initialTiles.reduce((acc, current) => ({ ...acc, [current.tileId]: current }), {} as Record<string, TileState>),
 };

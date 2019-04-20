@@ -16,6 +16,9 @@ export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$
     const hubConnection = new HubConnectionBuilder()
         .configureLogging(LogLevel.Debug)
         .withUrl("https://localhost:5043/clients")
+        .withAutomaticReconnect({
+            nextRetryDelayInMilliseconds: (_,__) => 2000
+        })
         .build();
 
     const connect$ = handleConnectAction(hubConnection, actions$, state$);
@@ -69,12 +72,15 @@ const handleSubscribeToInfiniteProduct = (hubConnection: HubConnection, actions$
     return actions$.pipe(
         ofType<RootAction, SubscribeToInfiniteProductAction>(SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION),
         mergeMap(action => {
-            return Observable.create((observer: Observer<InfiniteProductPriceAction>) => {
+            return Observable.create((observer: Observer<InfiniteProductNewPrice>) => {
                 const streamResult = hubConnection.stream<InfiniteProductNewPrice>("SubscribeToInfiniteProduct", action.productId)
 
-                streamResult.subscribe(observer);
-
-            }) as Observable<InfiniteProductPriceAction>;
+                streamResult.subscribe({
+                    next: (x) => observer.next(x),
+                    error: (err) => observer.complete(),
+                    complete: () => observer.complete()
+                });
+            }) as Observable<InfiniteProductNewPrice>;
         }),
         map(action => updateInfiniteProductPrice(action.productId, action.price))
     );
