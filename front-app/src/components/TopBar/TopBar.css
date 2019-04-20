@@ -32,11 +32,6 @@ li div:hover:not(.active) {
     background-color: #4CAF50;
 }
 
-li svg {
-    display: block;
-    text-align: center;
-}
-
 .TopBar-logo-Connected {
     height: 48px;
     pointer-events: none;
