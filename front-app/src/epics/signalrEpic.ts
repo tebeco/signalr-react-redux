@@ -1,15 +1,15 @@
-import { Observable, defer, Subject, Observer } from 'rxjs';
+import { Observable, defer, Subject, Observer, bindCallback } from 'rxjs';
 import { mergeMap, map, tap, withLatestFrom, filter, merge } from 'rxjs/operators';
 import { HubConnectionBuilder, LogLevel, HubConnection } from '@aspnet/signalr'
-import { ofType, StateObservable } from 'redux-observable';
+import { ofType, StateObservable, ActionsObservable } from 'redux-observable';
 import { RootState } from '../store/rootState';
 import { RootAction } from '../store/rootActions';
-import { SIGNALR_CONNECT_ACTION, SIGNALR_DISCONNECT_ACTION, onSignalRConnected, onSignalRDisconnected, onSignalRDisconnecting } from '../reducers/connectivityActions';
+import { SIGNALR_CONNECT_ACTION, SIGNALR_DISCONNECT_ACTION, onSignalRConnected, onSignalRDisconnected, onSignalRDisconnecting, disconnectFromSignalR } from '../reducers/connectivityActions';
 import { ConnectAction, DisconnectAction, ConnectivityAction } from '../reducers/connectivityActions';
 import { SubscribeToInfiniteProductAction, SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION, updateInfiniteProductPrice, SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION, SubscribeToLimitedProductAction, LimitedProductAction, updateLimitedProductPrice, onSubscribedToLimitedProduct, onUnsubscribedToLimitedProduct, InfiniteProductAction, onSubscribedToInfiniteProduct, onUnsubscribedToInfiniteProduct } from '../reducers/pricerActions';
 
 
-export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$: StateObservable<RootState>) => {
+export const createSignalrEpic = () => (actions$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) => {
     //Create subject
     const signalrEpicSubject = new Subject<RootAction>();
 
@@ -22,11 +22,13 @@ export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$
     const diconnect$ = handleDisconnectAction(hubConnection, actions$, state$);
     const subscribeToInfiniteProduct$ = handleSubscribeToInfiniteProduct(hubConnection, actions$, state$);
     const subscribeToLimitedProduct$ = handleSubscribeToLimitedProduct(hubConnection, actions$, state$);
+    const serverCommands$ = handleServerCommands(hubConnection, actions$, state$)
 
     connect$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
     diconnect$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
     subscribeToInfiniteProduct$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
     subscribeToLimitedProduct$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
+    serverCommands$.subscribe({ next: (action) => signalrEpicSubject.next(action) });
 
     hubConnection.onclose((err) => {
         signalrEpicSubject.next(onSignalRDisconnected());
@@ -35,7 +37,7 @@ export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$
     return signalrEpicSubject;
 };
 
-const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: StateObservable<RootState>): Observable<ConnectivityAction> => {
+const handleConnectAction = (hubConnection: HubConnection, actions$: ActionsObservable<RootAction>, state$: StateObservable<RootState>): Observable<ConnectivityAction> => {
     return actions$.pipe(
         ofType<RootAction, ConnectAction>(SIGNALR_CONNECT_ACTION),
         mergeMap(_ => {
@@ -52,7 +54,7 @@ const handleConnectAction = (hubConnection: HubConnection, actions$: Observable<
     )
 };
 
-const handleDisconnectAction = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: StateObservable<RootState>): Observable<ConnectivityAction> => {
+const handleDisconnectAction = (hubConnection: HubConnection, actions$: ActionsObservable<RootAction>, state$: StateObservable<RootState>): Observable<ConnectivityAction> => {
     return actions$.pipe(
         ofType<RootAction, DisconnectAction>(SIGNALR_DISCONNECT_ACTION),
         map(_ => onSignalRDisconnecting()),
@@ -65,7 +67,7 @@ interface InfiniteProductNewPrice {
     price: string
 }
 
-const handleSubscribeToInfiniteProduct = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: StateObservable<RootState>): Observable<InfiniteProductAction> => {
+const handleSubscribeToInfiniteProduct = (hubConnection: HubConnection, actions$: ActionsObservable<RootAction>, state$: StateObservable<RootState>): Observable<InfiniteProductAction> => {
     return actions$.pipe(
         ofType<RootAction, SubscribeToInfiniteProductAction>(SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION),
         withLatestFrom(state$),
@@ -99,7 +101,7 @@ interface LimitedProductNewPrice {
     price: string
 }
 
-const handleSubscribeToLimitedProduct = (hubConnection: HubConnection, actions$: Observable<RootAction>, state$: StateObservable<RootState>): Observable<LimitedProductAction> => {
+const handleSubscribeToLimitedProduct = (hubConnection: HubConnection, actions$: ActionsObservable<RootAction>, state$: StateObservable<RootState>): Observable<LimitedProductAction> => {
     return actions$.pipe(
         ofType<RootAction, SubscribeToLimitedProductAction>(SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION),
         withLatestFrom(state$),
@@ -126,3 +128,12 @@ const handleSubscribeToLimitedProduct = (hubConnection: HubConnection, actions$:
         })
     );
 };
+
+const handleServerCommands = (hubConnection: HubConnection, actions$: ActionsObservable<RootAction>, state$: StateObservable<RootState>): Observable<RootAction> => {
+    const serverCommands = new Subject<DisconnectAction>();
+    hubConnection.on("disconnect", _ => {
+        console.log('disconnect');
+        serverCommands.next(disconnectFromSignalR());
+    });
+    return serverCommands;
+}

@@ -33,16 +33,6 @@ const getConnectivityLogo = (props: TopBarStateProps) => {
         default:
             throw "unhandled connectivity state";
     }
-    // switch (props.appConnectivity) {
-    //     case 'Connected':
-    //         return '#00FF99';
-    //     case 'Connecting':
-    //         return '#61DAFB';
-    //     case 'Disconnected':
-    //         return '#BB3333';
-    //     default:
-    //         throw "unhandled connectivity state";
-    // };
 };
 
 const TopBarComponent = (props: TopBarStateProps & TopBarDispacthProps) => {
