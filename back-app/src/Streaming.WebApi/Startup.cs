@@ -50,7 +50,6 @@ namespace Streaming.WebApi
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<FrontClientHub>("/clients");
                 endpoints.MapControllers();
             });
         }
