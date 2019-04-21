@@ -25,11 +25,3 @@ export const workspaceReducer = (state: WorkspaceState = initialWorkspaceState, 
             return state;
     }
 }
-
-
-// export const resetPriceReducer = (state: WorkspaceState = initialWorkspaceState, action: ConnectivityAction): WorkspaceState => {
-//     switch (action.type) {
-//         default:
-//             return state;
-//     }
-// }

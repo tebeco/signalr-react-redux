@@ -5,6 +5,7 @@ import './index.css';
 import { App } from './components/App';
 import * as serviceWorker from './serviceWorker';
 import { configureStore } from './store/configureStore';
+import { connectToSignalR } from './reducers/connectivityActions';
 
 // Create the store
 const store = configureStore()
@@ -19,6 +20,8 @@ ReactDOM.render(
     </Provider>,
     rootElement
 );
+
+store.dispatch(connectToSignalR());
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

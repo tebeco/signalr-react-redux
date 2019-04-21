@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch } from 'redux';
 import { RootState } from '../../store/rootState';
 import { ConnectivityAction } from '../../reducers/connectivityActions';
-import { SubscribeToLimitedProductAction, subscribeToLimitedProductAction } from '../../reducers/pricerActions';
+import { SubscribeToLimitedProductAction, subscribeToLimitedProduct } from '../../reducers/pricerActions';
 import { LimitedProductTileState } from '../../store/workspaceState';
 import { ConnectivityStateType } from '../../store/connectivityState';
 import { TileOwnProps } from '../Tile/Tile';
@@ -36,7 +36,7 @@ const LimitedProductTileComponent = (props: LimitedProductTileStateProps & Limit
     </div>
 );
 
-const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>): LimitedProductTileDispatchProps => bindActionCreators({ subscribeToLimitedProductAction }, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>): LimitedProductTileDispatchProps => bindActionCreators({ subscribeToLimitedProductAction: subscribeToLimitedProduct }, dispatch);
 
 const mapStateToProps = (state: RootState, ownProps: TileOwnProps): LimitedProductTileStateProps => {
     const limitedProductState = state.workspace.tiles[ownProps.tileId] as LimitedProductTileState;

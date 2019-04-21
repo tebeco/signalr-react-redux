@@ -7,7 +7,7 @@ export type ProductAction =
 ////////////////////// INFINITE PRODUCT
 ////////////////////////////////////////////
 
-export type InfiniteProductAction = 
+export type InfiniteProductAction =
     | SubscribeToInfiniteProductAction
     | SubscribedToInfiniteProductAction
     | UnsubscribedToInfiniteProductAction
@@ -39,17 +39,17 @@ export interface InfiniteProductPriceAction {
     price: string
 }
 
-export const subscribeToInfiniteProductAction = (productId: string): SubscribeToInfiniteProductAction => ({
+export const subscribeToInfiniteProduct = (productId: string): SubscribeToInfiniteProductAction => ({
     type: 'SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION',
     productId,
 });
 
-export const onSubscribedToInfiniteProductAction = (productId: string): SubscribedToInfiniteProductAction => ({
+export const onSubscribedToInfiniteProduct = (productId: string): SubscribedToInfiniteProductAction => ({
     type: 'SUBSCRIBED_TO_INFINITE_PRODUCT_ACTION',
     productId,
 });
 
-export const onUnsubscribedToInfiniteProductAction = (productId: string): UnsubscribedToInfiniteProductAction => ({
+export const onUnsubscribedToInfiniteProduct = (productId: string): UnsubscribedToInfiniteProductAction => ({
     type: 'UNSUBSCRIBED_TO_INFINITE_PRODUCT_ACTION',
     productId,
 });
@@ -64,7 +64,7 @@ export const updateInfiniteProductPrice = (productId: string, price: string): In
 ////////////////////// LIMITED PRODUCT
 ////////////////////////////////////////////
 
-export type LimitedProductAction = 
+export type LimitedProductAction =
     | SubscribeToLimitedProductAction
     | SubscribedToLimitedProductAction
     | UnsubscribedToLimitedProductAction
@@ -95,17 +95,17 @@ export interface LimitedProductPriceAction {
     price: string
 }
 
-export const subscribeToLimitedProductAction = (productId: string): SubscribeToLimitedProductAction => ({
+export const subscribeToLimitedProduct = (productId: string): SubscribeToLimitedProductAction => ({
     type: 'SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION',
     productId,
 });
 
-export const onSubscribedToLimitedProductAction = (productId: string):  SubscribedToLimitedProductAction => ({
+export const onSubscribedToLimitedProduct = (productId: string): SubscribedToLimitedProductAction => ({
     type: 'SUBSCRIBED_TO_LIMITED_PRODUCT_ACTION',
     productId,
 });
 
-export const onUnsubscribedToLimitedProductAction = (productId: string):  UnsubscribedToLimitedProductAction => ({
+export const onUnsubscribedToLimitedProduct = (productId: string): UnsubscribedToLimitedProductAction => ({
     type: 'UNSUBSCRIBED_TO_LIMITED_PRODUCT_ACTION',
     productId,
 });
