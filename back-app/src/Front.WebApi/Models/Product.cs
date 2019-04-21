@@ -1,4 +1,4 @@
-﻿namespace Front.WebApi.Hubs
+﻿namespace Front.WebApi.Models
 {
     public struct Product
     {
