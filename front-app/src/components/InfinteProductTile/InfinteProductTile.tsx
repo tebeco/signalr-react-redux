@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch } from 'redux';
 import { RootState } from '../../store/rootState';
 import { ConnectivityAction } from '../../reducers/connectivityActions';
-import { SubscribeToInfiniteProductAction, subscribeToInfiniteProductAction } from '../../reducers/pricerActions';
+import { SubscribeToInfiniteProductAction, subscribeToInfiniteProduct } from '../../reducers/pricerActions';
 import { InfinteProductTileState } from '../../store/workspaceState';
 import { ConnectivityStateType } from '../../store/connectivityState';
 import { TileOwnProps } from '../Tile/Tile';
@@ -36,7 +36,7 @@ const InfinteProductTileComponent = (props: InfinteProductTileStateProps & Infin
     </div>
 );
 
-const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>) => bindActionCreators({ subscribeToInfiniteProductAction }, dispatch);
+const mapDispatchToProps = (dispatch: Dispatch<ConnectivityAction>) => bindActionCreators({ subscribeToInfiniteProductAction: subscribeToInfiniteProduct }, dispatch);
 
 const mapStateToProps = (state: RootState, ownProps: TileOwnProps) : InfinteProductTileStateProps => {
     const limitedProductState = state.workspace.tiles[ownProps.tileId] as InfinteProductTileState;

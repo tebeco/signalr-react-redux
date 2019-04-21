@@ -6,7 +6,7 @@ import { RootState } from '../store/rootState';
 import { RootAction } from '../store/rootActions';
 import { SIGNALR_CONNECT_ACTION, SIGNALR_DISCONNECT_ACTION, onSignalRConnected, onSignalRDisconnected, onSignalRDisconnecting } from '../reducers/connectivityActions';
 import { ConnectAction, DisconnectAction, ConnectivityAction } from '../reducers/connectivityActions';
-import { SubscribeToInfiniteProductAction, SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION, updateInfiniteProductPrice, SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION, SubscribeToLimitedProductAction, LimitedProductAction, updateLimitedProductPrice, onSubscribedToLimitedProductAction, onUnsubscribedToLimitedProductAction, InfiniteProductAction, onSubscribedToInfiniteProductAction, onUnsubscribedToInfiniteProductAction } from '../reducers/pricerActions';
+import { SubscribeToInfiniteProductAction, SUBSCRIBE_TO_INFINITE_PRODUCT_ACTION, updateInfiniteProductPrice, SUBSCRIBE_TO_LIMITED_PRODUCT_ACTION, SubscribeToLimitedProductAction, LimitedProductAction, updateLimitedProductPrice, onSubscribedToLimitedProduct, onUnsubscribedToLimitedProduct, InfiniteProductAction, onSubscribedToInfiniteProduct, onUnsubscribedToInfiniteProduct } from '../reducers/pricerActions';
 
 
 export const createSignalrEpic = () => (actions$: Observable<RootAction>, state$: StateObservable<RootState>) => {
@@ -77,7 +77,7 @@ const handleSubscribeToInfiniteProduct = (hubConnection: HubConnection, actions$
                 const streamResult = hubConnection.stream<InfiniteProductNewPrice>("SubscribeToInfiniteProduct", action.productId);
 
                 const unsubscribe = (observer: Observer<InfiniteProductAction>, productId: string) => {
-                    observer.next(onUnsubscribedToInfiniteProductAction(action.productId));
+                    observer.next(onUnsubscribedToInfiniteProduct(action.productId));
                     observer.complete();
                 }
 
@@ -87,7 +87,7 @@ const handleSubscribeToInfiniteProduct = (hubConnection: HubConnection, actions$
                     complete: () => unsubscribe(observer, action.productId),
                 });
 
-                observer.next(onSubscribedToInfiniteProductAction(action.productId));
+                observer.next(onSubscribedToInfiniteProduct(action.productId));
             }) as Observable<InfiniteProductAction>;
         })
     );
@@ -111,7 +111,7 @@ const handleSubscribeToLimitedProduct = (hubConnection: HubConnection, actions$:
                 const streamResult = hubConnection.stream<LimitedProductNewPrice>("SubscribeToLimitedProduct", action.productId);
 
                 const unsubscribe = (observer: Observer<LimitedProductAction>, productId: string) => {
-                    observer.next(onUnsubscribedToLimitedProductAction(action.productId));
+                    observer.next(onUnsubscribedToLimitedProduct(action.productId));
                     observer.complete();
                 }
 
@@ -121,7 +121,7 @@ const handleSubscribeToLimitedProduct = (hubConnection: HubConnection, actions$:
                     complete: () => unsubscribe(observer, action.productId),
                 });
 
-                observer.next(onSubscribedToLimitedProductAction(action.productId));
+                observer.next(onSubscribedToLimitedProduct(action.productId));
             }) as Observable<LimitedProductAction>;
         })
     );
