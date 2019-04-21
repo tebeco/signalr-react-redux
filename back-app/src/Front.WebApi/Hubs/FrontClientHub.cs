@@ -19,7 +19,7 @@ namespace Front.WebApi.Hubs
         public ChannelReader<Product> SubscribeToInfiniteProduct(string productId)
         {
             var publisher = _infiniteProductPublisherFactory.GetOrCreatePublisher(productId);
-            return publisher.DataChannel.Reader;
+            return publisher.AddConsumer(Context.ConnectionId);
         }
 
         public ChannelReader<Product> SubscribeToLimitedProduct(string productId)
