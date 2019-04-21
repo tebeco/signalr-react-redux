@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0-preview4-19216-03" />
     <PackageReference Include="Microsoft.Azure.SignalR" Version="1.1.0-preview1-10384" />
-    <PackageReference Include="System.Reactive" Version="4.2.0-preview.102" />
+    <PackageReference Include="System.Reactive" Version="4.1.5" />
   </ItemGroup>
 
 </Project>
