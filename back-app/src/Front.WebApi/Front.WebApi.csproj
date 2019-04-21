@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UserSecretsId>signalr-react-redux</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

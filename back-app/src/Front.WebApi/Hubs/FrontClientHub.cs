@@ -13,7 +13,7 @@ namespace Front.WebApi.Hubs
         private readonly InfinitePublisherFactory<Product> _infiniteProductPublisherFactory;
         private readonly LimitedPublisherFactory<Product> _limitedProductPublisherFactory;
 
-        private static readonly ConcurrentDictionary<string, InfinitePublisher<Product>> _publisherTrackers = new ConcurrentDictionary<string, InfinitePublisher<Product>>();
+        internal static readonly ConcurrentDictionary<string, InfinitePublisher<Product>> ClientTrackers = new ConcurrentDictionary<string, InfinitePublisher<Product>>();
 
         public FrontClientHub(InfinitePublisherFactory<Product> infiniteProductPublisherFactory, LimitedPublisherFactory<Product> limitedPublisherFactory)
         {
@@ -24,7 +24,7 @@ namespace Front.WebApi.Hubs
         public ChannelReader<Product> SubscribeToInfiniteProduct(string productId)
         {
             var publisher = _infiniteProductPublisherFactory.GetOrCreatePublisher(productId);
-            _publisherTrackers.GetOrAdd(Context.ConnectionId, publisher);
+            ClientTrackers.GetOrAdd(Context.ConnectionId, publisher);
             return publisher.AddConsumer(Context.ConnectionId);
         }
 
@@ -32,11 +32,17 @@ namespace Front.WebApi.Hubs
         {
             var publisher = _limitedProductPublisherFactory.CreatePublisher(productId, 5, TimeSpan.FromMilliseconds(500));
             return publisher.DataChannel.Reader;
+
+        }
+
+        public override Task OnConnectedAsync()
+        {
+            return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            if(_publisherTrackers.TryGetValue(Context.ConnectionId, out var publisher))
+            if(ClientTrackers.TryGetValue(Context.ConnectionId, out var publisher))
             {
                 publisher.RemoveConsumer(Context.ConnectionId);
             }
