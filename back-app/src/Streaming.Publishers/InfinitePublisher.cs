@@ -13,16 +13,17 @@ namespace Streaming.Publishers
     {
         private readonly IDisposable _subscription;
         private readonly ConcurrentDictionary<string, Channel<TData>> consumers = new ConcurrentDictionary<string, Channel<TData>>();
-            
+
         public InfinitePublisher(string publisherId, TimeSpan interval, Func<string, TData> factory)
         {
             _subscription = Observable.Interval(interval)
-                                    .Select((_, index) => factory(publisherId))
+                                    .Select((_, index) => factory(PublisherId))
                                     .Subscribe(
                                         data => PublishAll(data),
                                         _ => TryCompleteAll(),
                                         () => TryCompleteAll()
                                     );
+            PublisherId = publisherId;
         }
 
         public ChannelReader<TData> AddConsumer(string consumerId)
@@ -49,6 +50,21 @@ namespace Streaming.Publishers
                                      channel.Value.Writer.TryComplete();
                                  });
         }
+
+        public void RemoveConsumer(string connectionId)
+        {
+            consumers.TryRemove(connectionId, out var _);
+        }
+
+        public IEnumerable<string> Consumers
+        {
+            get
+            {
+                return consumers.ToArray().Select(kvp => kvp.Key);
+            }
+        }
+
+        public string PublisherId { get; }
 
         public void Dispose()
         {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Streaming.Publishers;
 
-namespace Front.WebApi.Hubs
+namespace Front.WebApi.Models
 {
     public class ProductFactory : IDataFactory<Product>
     {
