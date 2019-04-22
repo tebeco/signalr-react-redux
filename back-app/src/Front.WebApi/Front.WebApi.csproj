@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Streaming.Publishers\Streaming.Publishers.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

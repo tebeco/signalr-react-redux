@@ -1,0 +1,55 @@
+trigger:
+  branches:
+    include:
+    - dev
+steps:
+- task: UseDotNet@2
+  name: 'install_dotnet_sdk'
+  inputs:
+    version: '3.0.100-preview4-011223'
+- task: DotNetCoreCLI@2
+  name: 'dotnet_restore'
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'
+    workingDirectory: './back-app/'
+- task: DotNetCoreCLI@2
+  name: 'dotnet_build'
+  inputs:
+    command: 'build'
+    workingDirectory: './back-app/'
+    arguments: './SignalrReactRedux.sln -c Release'
+- task: DotNetCoreCLI@2
+  name: 'dotnet_publish'
+  inputs:
+    command: 'publish'
+    projects: './back-app/src/Front.WebApi/Front.WebApi.csproj'
+    arguments: '--self-contained --runtime win10-x64 --configuration Release'
+    publishWebProjects: false
+    zipAfterPublish: false
+- task: Npm@1
+  name: 'npm_install'
+  inputs:
+    command: 'install'
+    workingDir: '.\front-app'
+- task: Npm@1
+  name: 'npm_run_build'  
+  inputs:
+    command: 'custom'
+    workingDir: './front-app'
+    customCommand: 'run build'
+- task: CopyFiles@2
+  name: 'copy_front_artifact_to_wwwroot'
+  inputs:
+    SourceFolder: './front-app/build'
+    TargetFolder: './back-app/src/Front.WebApi/bin/Release/netcoreapp3.0/win10-x64/publish/wwwroot'
+    CleanTargetFolder: true
+    OverWrite: true
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: './back-app/src/Front.WebApi/bin/Release/netcoreapp3.0/win10-x64/publish'
+    includeRootFolder: false
+- task: PublishBuildArtifacts@1
+  name: 'publish_artifacts'
+  inputs:
+    ArtifactName: 'drop_$(Build.BuildId)'
