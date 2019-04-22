@@ -12,8 +12,6 @@ namespace Streaming.Publishers
 
         public Channel<TData> DataChannel { get; }
 
-        
-
         public LimitedPublisher(string publisherId, int count, TimeSpan interval, Func<string, TData> factory)
         {
             DataChannel = Channel.CreateUnbounded<TData>();

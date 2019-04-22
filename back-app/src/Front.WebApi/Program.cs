@@ -25,6 +25,7 @@ namespace Front.WebApi
                 {
                     webBuilder.UseStartup<Startup>();
 
+#if DEBUGsrg
                     // Add this section below
                     webBuilder.ConfigureKestrel(options =>
                     {
@@ -39,6 +40,7 @@ namespace Front.WebApi
                             ssl.ServerCertificate = cert.Cast<X509Certificate2>().First();
                         });
                     });
+#endif
                 });
     }
 }
