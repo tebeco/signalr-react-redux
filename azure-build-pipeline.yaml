@@ -1,7 +1,3 @@
-trigger:
-  branches:
-    include:
-    - dev
 steps:
 - task: UseDotNet@2
   name: 'install_dotnet_sdk'
