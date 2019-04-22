@@ -25,7 +25,7 @@ namespace Front.WebApi
                 {
                     webBuilder.UseStartup<Startup>();
 
-#if DEBUG
+#if DEBUGsrg
                     // Add this section below
                     webBuilder.ConfigureKestrel(options =>
                     {
