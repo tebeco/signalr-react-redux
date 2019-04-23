@@ -15,7 +15,7 @@ export const createSignalrEpic = () => (actions$: ActionsObservable<RootAction>,
 
     const hubConnection = new HubConnectionBuilder()
         .configureLogging(LogLevel.Debug)
-        .withUrl("/clients")
+        .withUrl("https://localhost:5043/clients")
         .build();
 
     const connect$ = handleConnectAction(hubConnection, actions$, state$);

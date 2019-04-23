@@ -5,6 +5,8 @@ using Streaming.Publishers;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Front.WebApi.Models;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Front.WebApi.Hubs
 {
@@ -12,27 +14,27 @@ namespace Front.WebApi.Hubs
     {
         private readonly InfinitePublisherFactory<Product> _infiniteProductPublisherFactory;
         private readonly LimitedPublisherFactory<Product> _limitedProductPublisherFactory;
+        private readonly ClientTracker _clientTracker;
 
-        internal static readonly ConcurrentDictionary<string, InfinitePublisher<Product>> ClientTrackers = new ConcurrentDictionary<string, InfinitePublisher<Product>>();
-
-        public FrontClientHub(InfinitePublisherFactory<Product> infiniteProductPublisherFactory, LimitedPublisherFactory<Product> limitedPublisherFactory)
+        public FrontClientHub(InfinitePublisherFactory<Product> infiniteProductPublisherFactory, LimitedPublisherFactory<Product> limitedPublisherFactory, ClientTracker clientTracker)
         {
             _infiniteProductPublisherFactory = infiniteProductPublisherFactory;
             _limitedProductPublisherFactory = limitedPublisherFactory;
+            _clientTracker = clientTracker;
         }
 
         public ChannelReader<Product> SubscribeToInfiniteProduct(string productId)
         {
             var publisher = _infiniteProductPublisherFactory.GetOrCreatePublisher(productId);
-            ClientTrackers.GetOrAdd(Context.ConnectionId, publisher);
-            return publisher.AddConsumer(Context.ConnectionId);
+            _clientTracker.Link(Context.ConnectionId, publisher);
+
+            return publisher.Subscribe(Context.ConnectionId);
         }
 
         public ChannelReader<Product> SubscribeToLimitedProduct(string productId)
         {
             var publisher = _limitedProductPublisherFactory.CreatePublisher(productId, 5, TimeSpan.FromMilliseconds(500));
             return publisher.DataChannel.Reader;
-
         }
 
         public override Task OnConnectedAsync()
@@ -42,10 +44,7 @@ namespace Front.WebApi.Hubs
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            if(ClientTrackers.TryGetValue(Context.ConnectionId, out var publisher))
-            {
-                publisher.RemoveConsumer(Context.ConnectionId);
-            }
+            _clientTracker.Cleanup(Context.ConnectionId);
 
             return base.OnDisconnectedAsync(exception);
         }

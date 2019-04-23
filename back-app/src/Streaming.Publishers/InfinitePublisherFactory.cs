@@ -17,7 +17,7 @@ namespace Streaming.Publishers
 
         public InfinitePublisher<TData> GetOrCreatePublisher(string publisherId)
         {
-            return _infinitePublishers.GetOrAdd(publisherId, (id) => new InfinitePublisher<TData>(id, TimeSpan.FromMilliseconds(200), (dataId) => _factory.Create(dataId)));
+            return _infinitePublishers.GetOrAdd(publisherId, (id) => new InfinitePublisher<TData>(id, TimeSpan.FromMilliseconds(1000), (dataId) => _factory.Create(dataId)));
         }
 
         public IEnumerable<InfinitePublisher<TData>> Publishers

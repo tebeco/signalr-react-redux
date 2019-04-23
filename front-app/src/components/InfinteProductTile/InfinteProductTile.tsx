@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch } from 'redux';
+import '../../index.css'
 import { RootState } from '../../store/rootState';
 import { ConnectivityAction } from '../../reducers/connectivityActions';
 import { SubscribeToInfiniteProductAction, subscribeToInfiniteProduct } from '../../reducers/pricerActions';
@@ -21,18 +22,8 @@ interface InfinteProductTileDispatchProps {
 
 const InfinteProductTileComponent = (props: InfinteProductTileStateProps & InfinteProductTileDispatchProps) => (
     <div className="tile">
-        Tile
-        <p>
-            id : '{props.tileId}'<br />
-            product id : '{props.productId}'<br />
-            {props.price}
-        </p>
-        {
-            props.connectivity === "Connected" &&
-            <p>
-                <a onClick={() => props.subscribeToInfiniteProductAction(props.productId)}>Subscribe</a>
-            </p>
-        }
+        <p className="productName">{props.productId}</p>
+        <div className="productPrice">{props.price}</div>
     </div>
 );
 

@@ -12,7 +12,7 @@ namespace Streaming.Publishers
     public class InfinitePublisher<TData> : IDisposable
     {
         private readonly IDisposable _subscription;
-        private readonly ConcurrentDictionary<string, Channel<TData>> consumers = new ConcurrentDictionary<string, Channel<TData>>();
+        private readonly ConcurrentDictionary<string, Channel<TData>> _subscribers = new ConcurrentDictionary<string, Channel<TData>>();
 
         public InfinitePublisher(string publisherId, TimeSpan interval, Func<string, TData> factory)
         {
@@ -26,41 +26,42 @@ namespace Streaming.Publishers
             PublisherId = publisherId;
         }
 
-        public ChannelReader<TData> AddConsumer(string consumerId)
+        public ChannelReader<TData> Subscribe(string subscriberId)
         {
             var channel = Channel.CreateUnbounded<TData>();
-            consumers.GetOrAdd(consumerId, channel);
+            _subscribers.GetOrAdd(subscriberId, channel);
             return channel.Reader;
         }
 
         public void PublishAll(TData data)
         {
-            Parallel.ForEach(consumers.ToArray(),
+            Parallel.ForEach(_subscribers.Values.ToArray(),
                              channel =>
                              {
-                                 channel.Value.Writer.TryWrite(data);
+                                 channel.Writer.TryWrite(data);
                              });
+
         }
 
         public void TryCompleteAll()
         {
-            Parallel.ForEach(consumers.ToArray(),
-                                 channel =>
-                                 {
-                                     channel.Value.Writer.TryComplete();
-                                 });
+            Parallel.ForEach(_subscribers.Values.ToArray(),
+                             channel =>
+                             {
+                                 channel.Writer.TryComplete();
+                             });
         }
 
-        public void RemoveConsumer(string connectionId)
+        public void Unsubscribe(string connectionId)
         {
-            consumers.TryRemove(connectionId, out var _);
+            _subscribers.TryRemove(connectionId, out var _);
         }
 
-        public IEnumerable<string> Consumers
+        public IEnumerable<string> Subscribers
         {
             get
             {
-                return consumers.ToArray().Select(kvp => kvp.Key);
+                return _subscribers.Keys.ToArray();
             }
         }
 

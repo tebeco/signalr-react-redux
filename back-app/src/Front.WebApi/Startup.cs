@@ -27,6 +27,7 @@ namespace Front.WebApi
             services.AddCors();
             services.AddSignalR();
 
+            services.AddSingleton<ClientTracker>();
             services.AddSingleton<IDataFactory<Product>, ProductFactory>();
             services.AddSingleton<InfinitePublisherFactory<Product>>();
             services.AddSingleton<LimitedPublisherFactory<Product>>();

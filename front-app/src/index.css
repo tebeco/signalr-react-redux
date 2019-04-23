@@ -8,6 +8,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
+.productName
+{
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-weight: bolder
+}
+
+.productPrice {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }

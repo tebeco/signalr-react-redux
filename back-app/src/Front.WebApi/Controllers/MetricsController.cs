@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Front.WebApi.Hubs;
 using Front.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -25,14 +26,17 @@ namespace Front.WebApi.Controllers
         public ActionResult<string> Get()
         {
             return JsonConvert.SerializeObject(
-                _productPublisherFactory.Publishers.Select(publisher =>
                 new
                 {
-                    publisher.PublisherId,
-                    publisher.Consumers
-                }),
+                    Publisher = _productPublisherFactory.Publishers.Select(publisher =>
+                        new
+                        {
+                            publisher.PublisherId,
+                            publisher.Subscribers
+                        }),
+                    }
+                ,
                 Formatting.Indented);
-
         }
     }
 }
