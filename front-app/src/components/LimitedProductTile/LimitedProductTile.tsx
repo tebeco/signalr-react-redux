@@ -1,4 +1,5 @@
 import React from 'react'
+import '../Tile/Tile.css'
 import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch } from 'redux';
 import { RootState } from '../../store/rootState';
@@ -21,12 +22,9 @@ interface LimitedProductTileDispatchProps {
 
 const LimitedProductTileComponent = (props: LimitedProductTileStateProps & LimitedProductTileDispatchProps) => (
     <div className="tile">
-        Tile
-        <p>
-            id : '{props.tileId}'<br />
-            product id : '{props.productId}'<br />
-            {props.price}
-        </p>
+        <p className="productName">{props.productId}</p>
+        <div className="productPrice">{props.price}</div>
+
         {
             props.connectivity === "Connected" &&
             <p>

@@ -36,9 +36,9 @@ const createDefaultLimitedProductTile = (tileId: string, productId: string): Lim
 const createDefaultErrorTile = (tileId: string) : ErrorTileState => ({ tileId, type: 'ERROR_TILE_STATE' });
 
 const initialTiles: TileState[] = [
-    createDefaultInfinteProductTile('1', 'productId1'),
-    createDefaultInfinteProductTile('2', 'productId1'),
-    createDefaultLimitedProductTile('3', 'productId3'),
+    createDefaultInfinteProductTile('1', 'EUR / USD'),
+    createDefaultInfinteProductTile('2', 'EUR / USD'),
+    createDefaultLimitedProductTile('3', 'EU / NOR'),
     createDefaultErrorTile('4'),
 ];
 

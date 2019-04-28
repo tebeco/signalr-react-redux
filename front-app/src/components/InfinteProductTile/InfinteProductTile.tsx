@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch } from 'redux';
-import '../../index.css'
+import '../Tile/Tile.css'
 import { RootState } from '../../store/rootState';
 import { ConnectivityAction } from '../../reducers/connectivityActions';
 import { SubscribeToInfiniteProductAction, subscribeToInfiniteProduct } from '../../reducers/pricerActions';

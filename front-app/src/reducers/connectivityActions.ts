@@ -49,6 +49,6 @@ export const onSignalRDisconnecting = (): OnDisconnectingAction => ({
     type: 'SIGNALR_ON_DISCONNECTING_ACTION'
 });
 
-export const onSignalRDisconnected = (): OnDisconnectedAction => ({
-    type: 'SIGNALR_ON_DISCONNECTED_ACTION'
-});
+    export const onSignalRDisconnected = (): OnDisconnectedAction => ({
+        type: 'SIGNALR_ON_DISCONNECTED_ACTION'
+    });

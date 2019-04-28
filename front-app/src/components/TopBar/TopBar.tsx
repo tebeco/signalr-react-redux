@@ -49,6 +49,7 @@ const TopBarComponent = (props: TopBarStateProps & TopBarDispacthProps) => {
 interface TopBarStateProps {
     appConnectivity: ConnectivityStateType;
 }
+
 interface TopBarDispacthProps {
     connectToSignalR: () => ConnectAction;
     disconnectFromSignalR: () => DisconnectAction;

@@ -3,7 +3,7 @@
     margin: 5px;
     
     display: grid;
-    grid-template-columns: auto;
+    grid-template-columns: auto auto auto;
     grid-gap: 15px 10px;
     justify-items: stretch;
     align-items: center;

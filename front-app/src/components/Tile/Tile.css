@@ -2,3 +2,13 @@
     color: #FFF;
     background-color: #282c34;
 }
+
+.productName
+{
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-weight: bolder
+}
+
+.productPrice {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
