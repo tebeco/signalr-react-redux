@@ -1,5 +1,5 @@
-import { Observable, defer, Subject, Observer, bindCallback } from 'rxjs';
-import { mergeMap, map, tap, withLatestFrom, filter, merge } from 'rxjs/operators';
+import { Observable, defer, Subject, Observer } from 'rxjs';
+import { mergeMap, map, tap, withLatestFrom, filter } from 'rxjs/operators';
 import { HubConnectionBuilder, LogLevel, HubConnection } from '@microsoft/signalr'
 import { ofType, StateObservable, ActionsObservable } from 'redux-observable';
 import { RootState } from '../store/rootState';

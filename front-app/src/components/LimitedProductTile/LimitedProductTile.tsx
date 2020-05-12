@@ -28,7 +28,7 @@ const LimitedProductTileComponent = (props: LimitedProductTileStateProps & Limit
         {
             props.connectivity === "Connected" &&
             <p>
-                <a onClick={() => props.subscribeToLimitedProductAction(props.productId)}>Subscribe</a>
+                <button onClick={() => props.subscribeToLimitedProductAction(props.productId)} >Subscribe</button>
             </p>
         }
     </div>

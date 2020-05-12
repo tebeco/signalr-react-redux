@@ -13,9 +13,9 @@ const getConnectivityButton = (props: TopBarStateProps & TopBarDispacthProps): J
     switch (props.appConnectivity) {
         case 'Connected':
         case 'Connecting':
-            return (<a onClick={props.disconnectFromSignalR}>Disconnect</a>);
+            return (<button onClick={props.disconnectFromSignalR} >Disconnect</button>);
         case 'Disconnected':
-            return (<a onClick={props.connectToSignalR}>Connect</a>);
+            return (<button onClick={props.connectToSignalR} >Connect</button>);
         default:
             throw "unhandled connectivity state";
     }
@@ -25,11 +25,11 @@ const getConnectivityLogo = (props: TopBarStateProps) => {
     const logoClassName = `TopBar-logo-${props.appConnectivity}`;
     switch (props.appConnectivity) {
         case 'Connected':
-            return (<img src={connectedLogo} className={logoClassName} />);
+            return (<img src={connectedLogo} className={logoClassName} alt="connected" />);
         case 'Connecting':
-            return (<img src={connectingLogo} className={logoClassName} />);
+            return (<img src={connectingLogo} className={logoClassName} alt="connecting" />);
         case 'Disconnected':
-            return (<img src={disconnectedLogo} className={logoClassName} />);
+            return (<img src={disconnectedLogo} className={logoClassName} alt="disconnected"/>);
         default:
             throw "unhandled connectivity state";
     }
