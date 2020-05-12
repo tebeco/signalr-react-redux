@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Reactive" Version="4.1.5" />
-    <PackageReference Include="System.Threading.Channels" Version="4.6.0-preview4.19212.13" />
+    <PackageReference Include="System.Reactive" Version="4.*" />
+    <PackageReference Include="System.Threading.Channels" Version="4.*" />
   </ItemGroup>
 
 </Project>
