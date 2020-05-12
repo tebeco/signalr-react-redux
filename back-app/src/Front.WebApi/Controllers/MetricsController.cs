@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Front.WebApi.Hubs;
+﻿using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Front.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Streaming.Publishers;
 
 namespace Front.WebApi.Controllers
@@ -25,7 +22,7 @@ namespace Front.WebApi.Controllers
         [HttpGet]
         public ActionResult<string> Get()
         {
-            return JsonConvert.SerializeObject(
+            return JsonSerializer.Serialize(
                 new
                 {
                     Publisher = _productPublisherFactory.Publishers.Select(publisher =>
@@ -34,9 +31,9 @@ namespace Front.WebApi.Controllers
                             publisher.PublisherId,
                             publisher.Subscribers
                         }),
-                    }
+                }
                 ,
-                Formatting.Indented);
+                new JsonSerializerOptions { WriteIndented = true });
         }
     }
 }
