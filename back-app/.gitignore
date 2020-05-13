@@ -4,3 +4,5 @@ bin/
 obj/
 
 *.*proj.user
+.fake
+.ionide
