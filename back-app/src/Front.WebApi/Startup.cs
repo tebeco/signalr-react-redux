@@ -24,7 +24,11 @@ namespace Front.WebApi
             services.AddControllers();
 
             services.AddCors();
-            services.AddSignalR();
+            services.AddSignalR()
+                    .AddJsonProtocol()
+                    .AddNewtonsoftJsonProtocol()
+                    .AddMessagePackProtocol()
+                    ;
 
             services.AddSingleton<ClientTracker>();
             services.AddSingleton<IDataFactory<Product>, ProductFactory>();
