@@ -1,8 +1,13 @@
-﻿namespace Front.WebApi.Models
+﻿using MessagePack;
+
+namespace Front.WebApi.Models
 {
     public struct Product
     {
-        public string ProductId;
-        public double Price;
+        [Key("productId")]
+        public string ProductId { get; set; }
+
+        [Key("productId")]
+        public double Price { get; set; }
     }
 }
