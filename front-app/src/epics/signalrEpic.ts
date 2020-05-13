@@ -1,6 +1,7 @@
 import { Observable, defer, Subject, Observer } from 'rxjs';
 import { mergeMap, map, tap, withLatestFrom, filter } from 'rxjs/operators';
-import { HubConnectionBuilder, LogLevel, HubConnection } from '@microsoft/signalr'
+import { HubConnectionBuilder, LogLevel, HubConnection, JsonHubProtocol } from '@microsoft/signalr'
+// import { MessagePackHubProtocol } from '@microsoft/signalr-protocol-msgpack'
 import { ofType, StateObservable, ActionsObservable } from 'redux-observable';
 import { RootState } from '../store/rootState';
 import { RootAction } from '../store/rootActions';
@@ -16,6 +17,8 @@ export const createSignalrEpic = () => (actions$: ActionsObservable<RootAction>,
     const hubConnection = new HubConnectionBuilder()
         .configureLogging(LogLevel.Debug)
         .withUrl("https://localhost:5043/clients")
+        // .withHubProtocol( new MessagePackHubProtocol())
+        .withAutomaticReconnect()
         .build();
 
     const connect$ = handleConnectAction(hubConnection, actions$, state$);
