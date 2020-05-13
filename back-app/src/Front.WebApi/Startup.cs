@@ -11,19 +11,25 @@ namespace Front.WebApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
 
-        public IConfiguration Configuration { get; }
+        public const string ReactSpaLocalhostCorsName = "react_spa_localhost";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
 
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy(ReactSpaLocalhostCorsName, policyBuilder =>
+                {
+                    policyBuilder.WithOrigins("http://localhost:3000")
+                                 .AllowCredentials()
+                                 .AllowAnyMethod()
+                                 .AllowAnyHeader();
+                });
+            });
+
             services.AddSignalR()
                     .AddJsonProtocol()
                     .AddNewtonsoftJsonProtocol()
@@ -39,31 +45,17 @@ namespace Front.WebApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
-
-            app.UseCors(corsPolicyBuilder =>
-            {
-                corsPolicyBuilder.WithOrigins("http://localhost:3000")
-                                 .AllowCredentials()
-                                 .AllowAnyMethod()
-                                 .AllowAnyHeader()
-                                 ;
-            });
-
             if (env.IsDevelopment())
             {
+                app.UseCors(ReactSpaLocalhostCorsName);
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-
             app.UseHttpsRedirection();
+
             app.UseRouting();
+
             app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<FrontClientHub>("/clients");
