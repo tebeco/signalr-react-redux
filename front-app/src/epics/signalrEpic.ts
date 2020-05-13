@@ -62,10 +62,12 @@ const handleDisconnectAction = (hubConnection: HubConnection, actions$: ActionsO
     )
 };
 
-interface InfiniteProductNewPrice {
+interface ProductNewPrice {
     productId: string,
     price: string
 }
+
+type InfiniteProductNewPrice = ProductNewPrice;
 
 const handleSubscribeToInfiniteProduct = (hubConnection: HubConnection, actions$: ActionsObservable<RootAction>, state$: StateObservable<RootState>): Observable<InfiniteProductAction> => {
     return actions$.pipe(
@@ -96,10 +98,7 @@ const handleSubscribeToInfiniteProduct = (hubConnection: HubConnection, actions$
 };
 
 
-interface LimitedProductNewPrice {
-    productId: string,
-    price: string
-}
+type LimitedProductNewPrice = ProductNewPrice;
 
 const handleSubscribeToLimitedProduct = (hubConnection: HubConnection, actions$: ActionsObservable<RootAction>, state$: StateObservable<RootState>): Observable<LimitedProductAction> => {
     return actions$.pipe(
