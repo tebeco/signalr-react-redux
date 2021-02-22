@@ -1,6 +1,6 @@
 import { Observable, defer, Subject, Observer } from 'rxjs';
 import { mergeMap, map, tap, withLatestFrom, filter } from 'rxjs/operators';
-import { HubConnectionBuilder, LogLevel, HubConnection, JsonHubProtocol } from '@microsoft/signalr'
+import { HubConnectionBuilder, LogLevel, HubConnection /*, JsonHubProtocol*/ } from '@microsoft/signalr'
 // import { MessagePackHubProtocol } from '@microsoft/signalr-protocol-msgpack'
 import { ofType, StateObservable, ActionsObservable } from 'redux-observable';
 import { RootState } from '../store/rootState';
