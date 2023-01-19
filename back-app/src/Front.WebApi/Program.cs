@@ -1,19 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Front.WebApi.Hubs;
 using Front.WebApi.Models;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace Front.WebApi
 {
@@ -38,8 +31,8 @@ namespace Front.WebApi
         public static void DebugCSharpClient()
         {
             StartClient<ISignalRBuilder>((hubConnectionBuilder) => { hubConnectionBuilder.AddMessagePackProtocol(); return "   MSGPACK"; });
-            StartClient<ISignalRBuilder>((hubConnectionBuilder) => { hubConnectionBuilder.AddJsonProtocol(); return "      JSON"; });
-            StartClient<ISignalRBuilder>((hubConnectionBuilder) => { hubConnectionBuilder.AddNewtonsoftJsonProtocol(); return "NEWTONSOFT"; });
+            // StartClient<ISignalRBuilder>((hubConnectionBuilder) => { hubConnectionBuilder.AddJsonProtocol(); return "      JSON"; });
+            // StartClient<ISignalRBuilder>((hubConnectionBuilder) => { hubConnectionBuilder.AddNewtonsoftJsonProtocol(); return "NEWTONSOFT"; });
         }
 
         public static void StartClient<T>(Func<ISignalRBuilder, string> addProtocol) where T : ISignalRBuilder
@@ -48,6 +41,7 @@ namespace Front.WebApi
                 .WithUrl("https://localhost:5043/clients")
                 .WithAutomaticReconnect()
                 ;
+
             var protocolName = addProtocol(hubConnectionBuilderBuilder);
             var hubConnection = hubConnectionBuilderBuilder.Build();
 
@@ -55,10 +49,12 @@ namespace Front.WebApi
             {
                 await hubConnection.StartAsync();
                 var channel = await hubConnection.StreamAsChannelAsync<Product>(nameof(FrontClientHub.SubscribeToInfiniteProduct), "EUR/USD");
-                while (true)
+                while (await channel.WaitToReadAsync())
                 {
-                    var product = await channel.ReadAsync();
-                    Console.WriteLine($"{protocolName} ---- {product.ProductId} : '{product.Price}'");
+                    while (channel.TryRead(out var product))
+                    {
+                        Console.WriteLine($"{protocolName} ---- {product.ProductId} : '{product.Price}'");
+                    }
                 }
             });
         }
